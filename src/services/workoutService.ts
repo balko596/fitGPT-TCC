@@ -1,6 +1,7 @@
 import { supabase, testConnection, isSupabaseConfigured } from '../lib/supabase';
 import { Workout } from '../types/Workout';
 import { updateProgressAfterWorkout } from './progressService';
+import { buildWorkoutPrompt } from './promptBuilder';
 
 // Mock data robusto como fallback APENAS quando Supabase não estiver configurado
 const mockWorkouts: Workout[] = [
@@ -524,104 +525,139 @@ const exerciseTemplates = {
   ]
 };
 
+const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
+  console.log('🤖 Chamando API do GPT para gerar treino...');
+
+  const prompt = buildWorkoutPrompt(preferences);
+
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const response = await fetch(`${apiUrl}/api/generate-workout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt,
+      fitnessLevel: preferences.fitnessLevel,
+      duration: preferences.duration,
+      goal: preferences.goal,
+      equipment: preferences.equipment,
+      focusAreas: preferences.focusAreas
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Erro ao gerar treino com IA');
+  }
+
+  const workoutData = await response.json();
+  console.log('✅ Treino gerado pela IA:', workoutData.name);
+
+  return workoutData;
+};
+
+const generateWorkoutWithTemplates = (preferences: any): any => {
+  console.log('📋 Gerando treino com templates locais...');
+
+  const { fitnessLevel, duration, goal, equipment, focusAreas } = preferences;
+
+  const durationConfig = {
+    'curto': { minutes: 25, calories: 200 },
+    'medio': { minutes: 45, calories: 350 },
+    'longo': { minutes: 65, calories: 500 }
+  };
+
+  const config = durationConfig[duration] || durationConfig['medio'];
+
+  const primaryFocus = focusAreas[0] || 'corpo-todo';
+  let selectedExercises = exerciseTemplates[primaryFocus] || exerciseTemplates['corpo-todo'];
+
+  selectedExercises = selectedExercises.map(exercise => {
+    let adjustedExercise = { ...exercise };
+
+    if (fitnessLevel === 'iniciante') {
+      adjustedExercise.sets = Math.max(2, exercise.sets - 1);
+      adjustedExercise.reps = exercise.reps.includes('-')
+        ? exercise.reps.split('-')[0] + '-' + (parseInt(exercise.reps.split('-')[1]) - 2)
+        : exercise.reps;
+    } else if (fitnessLevel === 'avancado') {
+      adjustedExercise.sets = exercise.sets + 1;
+      adjustedExercise.reps = exercise.reps.includes('-')
+        ? (parseInt(exercise.reps.split('-')[0]) + 2) + '-' + (parseInt(exercise.reps.split('-')[1]) + 3)
+        : exercise.reps;
+    }
+
+    return adjustedExercise;
+  });
+
+  return {
+    name: `Treino ${focusAreas.map(area =>
+      area.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+    ).join(' e ')} - ${fitnessLevel.charAt(0).toUpperCase() + fitnessLevel.slice(1)}`,
+    difficulty: fitnessLevel.charAt(0).toUpperCase() + fitnessLevel.slice(1),
+    muscleGroups: focusAreas.map((area: string) =>
+      area.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+    ),
+    duration: `${config.minutes} min`,
+    durationMinutes: config.minutes,
+    calories: config.calories,
+    equipment: equipment.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
+    exercises: selectedExercises,
+    instructions: `Treino personalizado gerado para ${fitnessLevel} focando em ${focusAreas.join(', ')}. Execute cada exercício com forma adequada e respeite os períodos de descanso.`
+  };
+};
+
 export const generateCustomWorkout = async (preferences: any): Promise<Workout> => {
   console.log('🎨 Gerando treino personalizado:', preferences);
-  
-  return new Promise(async (resolve, reject) => {
+
+  try {
+    let generatedWorkout;
+
     try {
-      // Simular processamento
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const { fitnessLevel, duration, goal, equipment, focusAreas } = preferences;
-      
-      // Determinar configurações baseadas nas preferências
-      const durationConfig = {
-        'curto': { minutes: 25, calories: 200 },
-        'medio': { minutes: 45, calories: 350 },
-        'longo': { minutes: 65, calories: 500 }
-      };
-      
-      const config = durationConfig[duration] || durationConfig['medio'];
-      
-      // Selecionar exercícios baseados na área de foco
-      const primaryFocus = focusAreas[0] || 'corpo-todo';
-      let selectedExercises = exerciseTemplates[primaryFocus] || exerciseTemplates['corpo-todo'];
-      
-      // Ajustar exercícios baseado no nível de fitness
-      selectedExercises = selectedExercises.map(exercise => {
-        let adjustedExercise = { ...exercise };
-        
-        if (fitnessLevel === 'iniciante') {
-          adjustedExercise.sets = Math.max(2, exercise.sets - 1);
-          adjustedExercise.reps = exercise.reps.includes('-') 
-            ? exercise.reps.split('-')[0] + '-' + (parseInt(exercise.reps.split('-')[1]) - 2)
-            : exercise.reps;
-        } else if (fitnessLevel === 'avancado') {
-          adjustedExercise.sets = exercise.sets + 1;
-          adjustedExercise.reps = exercise.reps.includes('-')
-            ? (parseInt(exercise.reps.split('-')[0]) + 2) + '-' + (parseInt(exercise.reps.split('-')[1]) + 3)
-            : exercise.reps;
-        }
-        
-        return adjustedExercise;
-      });
-      
-      // Criar o treino personalizado
-      const generatedWorkout = {
-        name: `Treino ${focusAreas.map(area => 
-          area.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
-        ).join(' e ')} - ${fitnessLevel.charAt(0).toUpperCase() + fitnessLevel.slice(1)}`,
-        difficulty: fitnessLevel.charAt(0).toUpperCase() + fitnessLevel.slice(1),
-        muscleGroups: focusAreas.map((area: string) => 
-          area.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
-        ),
-        duration: `${config.minutes} min`,
-        durationMinutes: config.minutes,
-        calories: config.calories,
-        equipment: equipment.map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
-        exercises: selectedExercises,
-        instructions: `Treino personalizado gerado para ${fitnessLevel} focando em ${focusAreas.join(', ')}. Execute cada exercício com forma adequada e respeite os períodos de descanso.`
-      };
+      generatedWorkout = await generateWorkoutWithAI(preferences);
+      console.log('✅ Treino gerado com IA');
+    } catch (aiError) {
+      console.warn('⚠️ Erro ao gerar com IA, usando templates:', aiError);
+      generatedWorkout = generateWorkoutWithTemplates(preferences);
+    }
 
-      try {
-        // Se Supabase estiver configurado, tentar salvar no Supabase
-        if (isSupabaseConfigured()) {
-          const { data: { user } } = await supabase.auth.getUser();
-          
-          if (user) {
-            console.log('💾 Tentando salvar treino no Supabase...');
-            const { data, error } = await supabase
-              .from('workouts')
-              .insert(convertWorkoutToSupabase(generatedWorkout, user.id))
-              .select()
-              .single();
+    try {
+      if (isSupabaseConfigured()) {
+        const { data: { user } } = await supabase.auth.getUser();
 
-            if (!error && data) {
-              console.log('✅ Treino salvo no Supabase com sucesso');
-              resolve(convertSupabaseToWorkout(data));
-              return;
-            } else {
-              console.warn('⚠️ Erro ao salvar no Supabase:', error?.message);
-            }
+        if (user) {
+          console.log('💾 Salvando treino no Supabase...');
+          const { data, error } = await supabase
+            .from('workouts')
+            .insert(convertWorkoutToSupabase(generatedWorkout, user.id))
+            .select()
+            .single();
+
+          if (!error && data) {
+            console.log('✅ Treino salvo no Supabase com sucesso');
+            return convertSupabaseToWorkout(data);
+          } else {
+            console.warn('⚠️ Erro ao salvar no Supabase:', error?.message);
           }
         }
-      } catch (supabaseError) {
-        console.warn('⚠️ Erro ao salvar no Supabase:', supabaseError);
       }
-
-      // Fallback: criar treino com ID local
-      const localWorkout: Workout = {
-        id: Date.now().toString(),
-        ...generatedWorkout
-      };
-
-      console.log('🎯 Treino criado localmente:', localWorkout.name);
-      resolve(localWorkout);
-    } catch (error) {
-      console.error('❌ Erro ao gerar treino personalizado:', error);
-      reject(new Error('Erro ao gerar treino personalizado. Tente novamente.'));
+    } catch (supabaseError) {
+      console.warn('⚠️ Erro ao salvar no Supabase:', supabaseError);
     }
-  });
+
+    const localWorkout: Workout = {
+      id: Date.now().toString(),
+      ...generatedWorkout
+    };
+
+    console.log('🎯 Treino criado:', localWorkout.name);
+    return localWorkout;
+  } catch (error) {
+    console.error('❌ Erro ao gerar treino personalizado:', error);
+    throw new Error('Erro ao gerar treino personalizado. Tente novamente.');
+  }
 };
 
 // Funções para favoritos

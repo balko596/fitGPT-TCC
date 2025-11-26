@@ -23,33 +23,38 @@ if (process.env.OPENAI_API_KEY) {
   console.warn('⚠️ OPENAI_API_KEY não encontrada. Funcionalidade de IA desabilitada.');
 }
 
-// Endpoint para gerar treino com GPT
 app.post('/api/generate-workout', async (req, res) => {
   try {
-    console.log('🤖 Recebendo solicitação de geração de treino:', req.body);
-    
+    console.log('🤖 Recebendo solicitação de geração de treino');
+    console.log('📋 Preferências:', {
+      fitnessLevel: req.body.fitnessLevel,
+      duration: req.body.duration,
+      goal: req.body.goal,
+      equipment: req.body.equipment?.join(', '),
+      focusAreas: req.body.focusAreas?.join(', ')
+    });
+
     if (!openai) {
       console.warn('⚠️ OpenAI não configurado, retornando erro');
-      return res.status(503).json({ 
-        error: 'Serviço de IA temporariamente indisponível. Configure OPENAI_API_KEY.' 
+      return res.status(503).json({
+        error: 'Serviço de IA temporariamente indisponível. Configure OPENAI_API_KEY no arquivo .env'
       });
     }
-    
-    const { prompt, fitnessLevel, duration, goal, equipment, focusAreas } = req.body;
-    
-    // Validar campos obrigatórios
+
+    const { prompt } = req.body;
+
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
     }
-    
-    console.log('🔄 Enviando prompt para OpenAI...');
-    
-    // Chamar OpenAI API
+
+    console.log('🔄 Enviando prompt para OpenAI GPT-3.5-turbo...');
+    console.log('📝 Tamanho do prompt:', prompt.length, 'caracteres');
+
     const completion = await openai.chat.completions.create({
       messages: [
         {
           role: 'system',
-          content: 'Você é um personal trainer especialista em criar planos de treino personalizados. Sempre responda apenas com JSON válido, sem texto adicional.'
+          content: 'Você é um personal trainer especialista em criar planos de treino personalizados. Sempre responda APENAS com JSON válido, sem nenhum texto adicional antes ou depois. O JSON deve seguir exatamente a estrutura solicitada.'
         },
         {
           role: 'user',
@@ -58,67 +63,86 @@ app.post('/api/generate-workout', async (req, res) => {
       ],
       model: 'gpt-3.5-turbo',
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 2000,
+      response_format: { type: 'json_object' }
     });
-    
+
     console.log('✅ Resposta recebida do OpenAI');
-    
-    // Parse da resposta
-    const workoutString = completion.choices[0].message.content;
-    console.log('📝 Conteúdo da resposta:', workoutString);
-    
+    console.log('📊 Tokens usados:', completion.usage?.total_tokens || 'N/A');
+
+    const workoutString = completion.choices[0].message.content.trim();
+    console.log('📝 Primeiros 200 caracteres da resposta:', workoutString.substring(0, 200));
+
     let workoutJson;
     try {
       workoutJson = JSON.parse(workoutString);
+      console.log('✅ JSON parseado com sucesso');
     } catch (parseError) {
-      console.error('❌ Erro ao fazer parse do JSON:', parseError);
-      console.log('📄 Conteúdo que falhou no parse:', workoutString);
-      
-      // Tentar extrair JSON da resposta se houver texto extra
+      console.error('❌ Erro ao fazer parse do JSON:', parseError.message);
+      console.log('📄 Conteúdo completo que falhou:', workoutString);
+
       const jsonMatch = workoutString.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
           workoutJson = JSON.parse(jsonMatch[0]);
-          console.log('✅ JSON extraído com sucesso');
+          console.log('✅ JSON extraído com regex e parseado com sucesso');
         } catch (secondParseError) {
-          console.error('❌ Falha na segunda tentativa de parse:', secondParseError);
-          throw new Error('Resposta da IA não está em formato JSON válido');
+          console.error('❌ Falha na segunda tentativa de parse:', secondParseError.message);
+          return res.status(500).json({
+            error: 'Resposta da IA não está em formato JSON válido'
+          });
         }
       } else {
-        throw new Error('Nenhum JSON encontrado na resposta da IA');
+        console.error('❌ Nenhum JSON encontrado na resposta');
+        return res.status(500).json({
+          error: 'Nenhum JSON encontrado na resposta da IA'
+        });
       }
     }
-    
-    // Validar estrutura do JSON
+
     if (!workoutJson.name || !workoutJson.exercises || !Array.isArray(workoutJson.exercises)) {
-      console.error('❌ Estrutura JSON inválida:', workoutJson);
-      throw new Error('Estrutura de treino inválida retornada pela IA');
+      console.error('❌ Estrutura JSON inválida:', Object.keys(workoutJson));
+      return res.status(500).json({
+        error: 'Estrutura de treino inválida retornada pela IA'
+      });
     }
-    
+
+    if (workoutJson.exercises.length === 0) {
+      console.error('❌ Nenhum exercício no treino');
+      return res.status(500).json({
+        error: 'Treino gerado sem exercícios'
+      });
+    }
+
     console.log('✅ Treino gerado com sucesso:', workoutJson.name);
-    
+    console.log('💪 Número de exercícios:', workoutJson.exercises.length);
+
     res.json(workoutJson);
   } catch (error) {
-    console.error('❌ Erro ao gerar treino:', error);
-    
-    // Retornar erro específico baseado no tipo
+    console.error('❌ Erro ao gerar treino:', error.message);
+    console.error('🔍 Stack trace:', error.stack);
+
     if (error.code === 'insufficient_quota') {
-      res.status(429).json({ 
-        error: 'Cota da API OpenAI excedida. Tente novamente mais tarde.' 
-      });
-    } else if (error.code === 'rate_limit_exceeded') {
-      res.status(429).json({ 
-        error: 'Muitas solicitações. Aguarde um momento e tente novamente.' 
-      });
-    } else if (error.message?.includes('API key')) {
-      res.status(401).json({ 
-        error: 'Erro de autenticação com a API de IA.' 
-      });
-    } else {
-      res.status(500).json({ 
-        error: 'Erro interno do servidor ao gerar treino. Tente novamente.' 
+      return res.status(429).json({
+        error: 'Cota da API OpenAI excedida. Verifique sua conta em platform.openai.com'
       });
     }
+
+    if (error.code === 'rate_limit_exceeded') {
+      return res.status(429).json({
+        error: 'Muitas solicitações. Aguarde um momento e tente novamente.'
+      });
+    }
+
+    if (error.message?.includes('API key') || error.code === 'invalid_api_key') {
+      return res.status(401).json({
+        error: 'Chave de API OpenAI inválida. Verifique o arquivo .env'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Erro ao gerar treino com IA. Tente novamente.'
+    });
   }
 });
 
