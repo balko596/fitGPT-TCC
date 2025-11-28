@@ -51,22 +51,22 @@ const Navbar: React.FC = () => {
             <Link to="/" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/')}`}>
               Início
             </Link>
-            <Link to="/workouts" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/workouts')}`}>
-              Treinos
-            </Link>
             {isAuthenticated && (
               <>
+                <Link to="/workouts" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/workouts')}`}>
+                  Treinos
+                </Link>
                 <Link to="/favorites" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/favorites')}`}>
                   Favoritos
                 </Link>
                 <Link to="/schedule" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/schedule')}`}>
                   Agenda
                 </Link>
+                <Link to="/gyms" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/gyms')}`}>
+                  Encontrar Academias
+                </Link>
               </>
             )}
-            <Link to="/gyms" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/gyms')}`}>
-              Encontrar Academias
-            </Link>
             <Link to="/about" className={`font-medium hover:text-blue-600 transition-colors ${isActive('/about')}`}>
               Sobre
             </Link>
@@ -116,22 +116,22 @@ const Navbar: React.FC = () => {
             <Link to="/" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/')}`}>
               Início
             </Link>
-            <Link to="/workouts" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/workouts')}`}>
-              Treinos
-            </Link>
             {isAuthenticated && (
               <>
+                <Link to="/workouts" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/workouts')}`}>
+                  Treinos
+                </Link>
                 <Link to="/favorites" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/favorites')}`}>
                   Favoritos
                 </Link>
                 <Link to="/schedule" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/schedule')}`}>
                   Agenda
                 </Link>
+                <Link to="/gyms" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/gyms')}`}>
+                  Encontrar Academias
+                </Link>
               </>
             )}
-            <Link to="/gyms" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/gyms')}`}>
-              Encontrar Academias
-            </Link>
             <Link to="/about" onClick={toggleMenu} className={`block font-medium hover:text-blue-600 transition-colors ${isActive('/about')}`}>
               Sobre
             </Link>

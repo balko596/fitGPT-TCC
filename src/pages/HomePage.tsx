@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
 import WorkoutGenerator from '../components/WorkoutGenerator';
 import { useWorkoutContext } from '../contexts/WorkoutContext';
+import { useAuth } from '../contexts/AuthContext';
 import { isSupabaseConfigured } from '../lib/supabase';
 
 const HomePage: React.FC = () => {
   const { generateWorkout, isGenerating, error } = useWorkoutContext();
+  const { isAuthenticated } = useAuth();
   const [showGenerator, setShowGenerator] = useState(false);
   const [showError, setShowError] = useState(true);
   const [showOfflineNotice, setShowOfflineNotice] = useState(!isSupabaseConfigured());
@@ -115,38 +117,40 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Generator Section */}
-      <section className="py-12 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-4">Crie Seu Plano de Treino Personalizado</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Nossa IA criará uma rotina de treino personalizada baseada nos seus objetivos, nível de condicionamento e equipamentos disponíveis.
-            </p>
+      {/* Generator Section - Only for authenticated users */}
+      {isAuthenticated && (
+        <section className="py-12 bg-slate-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4">Crie Seu Plano de Treino Personalizado</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Nossa IA criará uma rotina de treino personalizada baseada nos seus objetivos, nível de condicionamento e equipamentos disponíveis.
+              </p>
+            </div>
+
+            {showGenerator ? (
+              <div className="max-w-3xl mx-auto">
+                <WorkoutGenerator
+                  onGenerate={generateWorkout}
+                  isLoading={isGenerating}
+                />
+              </div>
+            ) : (
+              <div className="text-center">
+                <motion.button
+                  className="btn-primary inline-flex items-center"
+                  onClick={handleGenerateClick}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Dumbbell className="mr-2" size={20} />
+                  Criar Treino Personalizado
+                </motion.button>
+              </div>
+            )}
           </div>
-          
-          {showGenerator ? (
-            <div className="max-w-3xl mx-auto">
-              <WorkoutGenerator 
-                onGenerate={generateWorkout}
-                isLoading={isGenerating}
-              />
-            </div>
-          ) : (
-            <div className="text-center">
-              <motion.button 
-                className="btn-primary inline-flex items-center"
-                onClick={handleGenerateClick}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Dumbbell className="mr-2" size={20} />
-                Criar Treino Personalizado
-              </motion.button>
-            </div>
-          )}
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-16 bg-white">
@@ -209,15 +213,30 @@ const HomePage: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Pronto para Transformar Seu Condicionamento?</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Explore nossa biblioteca abrangente de treinos ou crie seu próprio plano personalizado hoje.
+            {isAuthenticated
+              ? 'Explore nossa biblioteca abrangente de treinos ou crie seu próprio plano personalizado hoje.'
+              : 'Crie uma conta gratuita para acessar treinos personalizados e muito mais.'}
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/workouts" className="btn-accent inline-block">
-              Explorar Treinos
-            </Link>
-            <button onClick={handleGenerateClick} className="btn-secondary inline-block">
-              Criar Plano Personalizado
-            </button>
+            {isAuthenticated ? (
+              <>
+                <Link to="/workouts" className="btn-accent inline-block">
+                  Explorar Treinos
+                </Link>
+                <button onClick={handleGenerateClick} className="btn-secondary inline-block">
+                  Criar Plano Personalizado
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/register" className="btn-accent inline-block">
+                  Criar Conta Grátis
+                </Link>
+                <Link to="/login" className="btn-secondary inline-block">
+                  Entrar
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
