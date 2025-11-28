@@ -530,16 +530,34 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
 
   const prompt = buildWorkoutPrompt(preferences);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  // Em produção, usa Supabase Edge Function. Em desenvolvimento, usa servidor local
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const isDevelopment = import.meta.env.DEV;
+
+  const apiUrl = isDevelopment
+    ? (import.meta.env.VITE_API_URL || 'http://localhost:5000')
+    : `${supabaseUrl}/functions/v1/generate-workout`;
 
   console.log('📡 URL da API:', apiUrl);
+  console.log('🌍 Ambiente:', isDevelopment ? 'Desenvolvimento' : 'Produção');
 
   try {
-    const response = await fetch(`${apiUrl}/api/generate-workout`, {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Em produção (Edge Function), adiciona a chave anon do Supabase
+    if (!isDevelopment) {
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      headers['Authorization'] = `Bearer ${anonKey}`;
+      console.log('🔑 Usando autenticação Supabase para Edge Function');
+    }
+
+    const endpoint = isDevelopment ? `${apiUrl}/api/generate-workout` : apiUrl;
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         prompt,
         fitnessLevel: preferences.fitnessLevel,
@@ -553,7 +571,10 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('❌ Erro da API:', errorData);
-      throw new Error(errorData.error || 'Erro ao gerar treino com IA');
+      const apiError = errorData.error || 'Erro ao gerar treino com IA';
+
+      // Propagar mensagem de erro que inclui "cota" ou "quota" para ativar o fallback
+      throw new Error(apiError);
     }
 
     const workoutData = await response.json();
@@ -563,7 +584,11 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
   } catch (error) {
     console.error('❌ Erro ao conectar com a API:', error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Servidor backend não está rodando. Execute "npm run server" em outro terminal.');
+      if (isDevelopment) {
+        throw new Error('⚠️ SERVIDOR BACKEND NÃO ESTÁ RODANDO!\n\nPara gerar treinos com IA, você precisa rodar:\nnpm run dev:all\n\nOU em outro terminal:\nnpm run server');
+      } else {
+        throw new Error('⚠️ Erro ao conectar com o serviço de IA. Tente novamente em alguns instantes.');
+      }
     }
     throw error;
   }
@@ -660,6 +685,28 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
     return localWorkout;
   } catch (error) {
     console.error('❌ Erro ao gerar treino personalizado:', error);
+
+    // Se o erro for relacionado à cota ou créditos da OpenAI, usar fallback de templates
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (errorMessage.includes('cota') || errorMessage.includes('quota') || errorMessage.includes('créditos')) {
+      console.warn('⚠️ API OpenAI sem créditos. Usando templates locais como fallback...');
+
+      try {
+        const generatedWorkout = generateWorkoutWithTemplates(preferences);
+        console.log('✅ Treino gerado com templates:', generatedWorkout.name);
+
+        const localWorkout: Workout = {
+          id: Date.now().toString(),
+          ...generatedWorkout
+        };
+
+        return localWorkout;
+      } catch (templateError) {
+        console.error('❌ Erro ao gerar treino com templates:', templateError);
+        throw new Error('Não foi possível gerar o treino. Tente novamente mais tarde.');
+      }
+    }
 
     if (error instanceof Error) {
       throw error;
