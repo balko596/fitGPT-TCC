@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Dumbbell, Search, Calendar, Star, Target, GitMerge, X, Database } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import { Dumbbell, Search, Calendar, Star, Target, GitMerge, X, Database, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
 import WorkoutGenerator from '../components/WorkoutGenerator';
 import { useWorkoutContext } from '../contexts/WorkoutContext';
@@ -11,9 +11,12 @@ import { isSupabaseConfigured } from '../lib/supabase';
 const HomePage: React.FC = () => {
   const { generateWorkout, isGenerating, error } = useWorkoutContext();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [showGenerator, setShowGenerator] = useState(false);
   const [showError, setShowError] = useState(true);
   const [showOfflineNotice, setShowOfflineNotice] = useState(!isSupabaseConfigured());
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [generatedWorkoutId, setGeneratedWorkoutId] = useState<string | null>(null);
 
   const handleSearch = (query: string) => {
     console.log('Buscando por:', query);
@@ -30,6 +33,23 @@ const HomePage: React.FC = () => {
 
   const dismissOfflineNotice = () => {
     setShowOfflineNotice(false);
+  };
+
+  const handleWorkoutSuccess = (workout: any) => {
+    console.log('✅ Treino criado com sucesso:', workout);
+    setGeneratedWorkoutId(workout.id);
+    setShowSuccessModal(true);
+  };
+
+  const handleGoToWorkout = () => {
+    if (generatedWorkoutId) {
+      navigate(`/workout/${generatedWorkoutId}`);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    setGeneratedWorkoutId(null);
   };
 
   return (
@@ -156,6 +176,7 @@ const HomePage: React.FC = () => {
                 <WorkoutGenerator
                   onGenerate={generateWorkout}
                   isLoading={isGenerating}
+                  onSuccess={handleWorkoutSuccess}
                 />
               </div>
             ) : (
@@ -263,6 +284,53 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleCloseModal}
+          >
+            <motion.div
+              className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                  <CheckCircle2 className="h-10 w-10 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Treino Criado com Sucesso!
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Seu plano de treino personalizado está pronto para você começar.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleGoToWorkout}
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Ver Treino
+                  </button>
+                  <button
+                    onClick={handleCloseModal}
+                    className="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

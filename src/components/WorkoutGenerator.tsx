@@ -5,6 +5,7 @@ import { Dumbbell, Clock, Target, User, Loader, CheckCircle } from 'lucide-react
 interface WorkoutGeneratorProps {
   onGenerate: (preferences: WorkoutPreferences) => Promise<any>;
   isLoading: boolean;
+  onSuccess?: (workout: any) => void;
 }
 
 interface WorkoutPreferences {
@@ -15,7 +16,7 @@ interface WorkoutPreferences {
   focusAreas: string[];
 }
 
-const WorkoutGenerator: React.FC<WorkoutGeneratorProps> = ({ onGenerate, isLoading }) => {
+const WorkoutGenerator: React.FC<WorkoutGeneratorProps> = ({ onGenerate, isLoading, onSuccess }) => {
   const [preferences, setPreferences] = useState<WorkoutPreferences>({
     fitnessLevel: 'intermediario',
     duration: 'medio',
@@ -45,12 +46,16 @@ const WorkoutGenerator: React.FC<WorkoutGeneratorProps> = ({ onGenerate, isLoadi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSuccess(false);
-    
+
     try {
       console.log('🎯 WorkoutGenerator: Enviando preferências:', preferences);
-      await onGenerate(preferences);
+      const workout = await onGenerate(preferences);
       setIsSuccess(true);
-      
+
+      if (onSuccess && workout) {
+        onSuccess(workout);
+      }
+
       // Resetar sucesso após 3 segundos
       setTimeout(() => {
         setIsSuccess(false);
