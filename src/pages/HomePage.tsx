@@ -97,7 +97,7 @@ const HomePage: React.FC = () => {
             >
               Planos de Treino com IA
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="text-xl mb-8 text-blue-100"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -105,14 +105,37 @@ const HomePage: React.FC = () => {
             >
               Obtenha rotinas de treino personalizadas geradas por inteligência artificial
             </motion.p>
-            <motion.div 
-              className="max-w-xl mx-auto bg-white rounded-lg p-2 shadow-lg"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <SearchBar onSearch={handleSearch} />
-            </motion.div>
+
+            {isAuthenticated ? (
+              <motion.div
+                className="max-w-xl mx-auto bg-white rounded-lg p-2 shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <SearchBar onSearch={handleSearch} />
+              </motion.div>
+            ) : (
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Link
+                  to="/login"
+                  className="flex-1 px-8 py-4 text-lg font-semibold bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex-1 px-8 py-4 text-lg font-semibold bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Criar conta
+                </Link>
+              </motion.div>
+            )}
           </div>
         </div>
       </section>
