@@ -2,8 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { OpenAI } from 'openai';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Carregar .env da raiz do projeto
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,13 +18,31 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Debug: Verificar se a chave foi carregada
+console.log('🔍 Verificando variáveis de ambiente...');
+console.log('📂 Diretório atual:', __dirname);
+console.log('📄 Arquivo .env em:', path.resolve(__dirname, '../.env'));
+
+const apiKey = process.env.OPENAI_API_KEY;
+if (apiKey) {
+  console.log('✅ OPENAI_API_KEY encontrada!');
+  console.log('🔑 Primeiros caracteres:', apiKey.substring(0, 10) + '...');
+} else {
+  console.error('❌ OPENAI_API_KEY NÃO encontrada!');
+  console.log('📋 Variáveis disponíveis:', Object.keys(process.env).filter(k => k.includes('OPENAI')));
+}
+
 // Initialize OpenAI
 let openai = null;
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  });
-  console.log('✅ OpenAI configurado com sucesso');
+if (apiKey) {
+  try {
+    openai = new OpenAI({
+      apiKey: apiKey
+    });
+    console.log('✅ OpenAI configurado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar OpenAI:', error.message);
+  }
 } else {
   console.warn('⚠️ OPENAI_API_KEY não encontrada. Funcionalidade de IA desabilitada.');
 }
