@@ -147,7 +147,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return newWorkout;
     } catch (error) {
       console.error('❌ WorkoutContext: Erro ao gerar treino:', error);
-      setError('Erro ao gerar treino personalizado. Tente novamente.');
+
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao gerar treino personalizado. Tente novamente.';
+      setError(errorMessage);
       throw error;
     } finally {
       setIsGenerating(false);

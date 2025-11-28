@@ -532,30 +532,41 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const response = await fetch(`${apiUrl}/api/generate-workout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt,
-      fitnessLevel: preferences.fitnessLevel,
-      duration: preferences.duration,
-      goal: preferences.goal,
-      equipment: preferences.equipment,
-      focusAreas: preferences.focusAreas
-    })
-  });
+  console.log('📡 URL da API:', apiUrl);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Erro ao gerar treino com IA');
+  try {
+    const response = await fetch(`${apiUrl}/api/generate-workout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt,
+        fitnessLevel: preferences.fitnessLevel,
+        duration: preferences.duration,
+        goal: preferences.goal,
+        equipment: preferences.equipment,
+        focusAreas: preferences.focusAreas
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('❌ Erro da API:', errorData);
+      throw new Error(errorData.error || 'Erro ao gerar treino com IA');
+    }
+
+    const workoutData = await response.json();
+    console.log('✅ Treino gerado pela IA:', workoutData.name);
+
+    return workoutData;
+  } catch (error) {
+    console.error('❌ Erro ao conectar com a API:', error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Servidor backend não está rodando. Execute "npm run server" em outro terminal.');
+    }
+    throw error;
   }
-
-  const workoutData = await response.json();
-  console.log('✅ Treino gerado pela IA:', workoutData.name);
-
-  return workoutData;
 };
 
 const generateWorkoutWithTemplates = (preferences: any): any => {
@@ -610,18 +621,11 @@ const generateWorkoutWithTemplates = (preferences: any): any => {
 };
 
 export const generateCustomWorkout = async (preferences: any): Promise<Workout> => {
-  console.log('🎨 Gerando treino personalizado:', preferences);
+  console.log('🎨 Gerando treino personalizado com IA:', preferences);
 
   try {
-    let generatedWorkout;
-
-    try {
-      generatedWorkout = await generateWorkoutWithAI(preferences);
-      console.log('✅ Treino gerado com IA');
-    } catch (aiError) {
-      console.warn('⚠️ Erro ao gerar com IA, usando templates:', aiError);
-      generatedWorkout = generateWorkoutWithTemplates(preferences);
-    }
+    const generatedWorkout = await generateWorkoutWithAI(preferences);
+    console.log('✅ Treino gerado com IA:', generatedWorkout.name);
 
     try {
       if (isSupabaseConfigured()) {
@@ -656,7 +660,12 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
     return localWorkout;
   } catch (error) {
     console.error('❌ Erro ao gerar treino personalizado:', error);
-    throw new Error('Erro ao gerar treino personalizado. Tente novamente.');
+
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error('Erro ao gerar treino com IA. Verifique se o servidor backend está rodando (npm run server).');
   }
 };
 
