@@ -85,7 +85,7 @@ export const buildWorkoutPrompt = (preferences: WorkoutPreferences): string => {
     }
   }
 
-  const prompt = `Crie um plano de treino personalizado com as seguintes características:
+  const prompt = '`Crie um plano de treino personalizado com as seguintes características:
 
 ${profileSection}
 
@@ -146,7 +146,7 @@ IMPORTANTE:
 - Todos os textos devem estar em português
 - Use URLs reais e válidas do Pexels
 - Seja criativo com o nome do treino
-- As instruções devem ser claras e motivadoras`;
+- As instruções devem ser claras e motivadoras`;'
 
   return prompt;
 };
