@@ -4,6 +4,13 @@ interface WorkoutPreferences {
   goal: string;
   equipment: string[];
   focusAreas: string[];
+  userProfile?: {
+    age?: number;
+    height?: number;
+    weight?: number;
+    fitness_level?: string;
+    goals?: string[];
+  };
 }
 
 const translateToPortuguese = {
@@ -47,7 +54,7 @@ const translateToPortuguese = {
 };
 
 export const buildWorkoutPrompt = (preferences: WorkoutPreferences): string => {
-  const { fitnessLevel, duration, goal, equipment, focusAreas } = preferences;
+  const { fitnessLevel, duration, goal, equipment, focusAreas, userProfile } = preferences;
 
   const levelPt = translateToPortuguese.fitnessLevel[fitnessLevel] || fitnessLevel;
   const durationPt = translateToPortuguese.duration[duration] || duration;
@@ -59,11 +66,28 @@ export const buildWorkoutPrompt = (preferences: WorkoutPreferences): string => {
     .map(a => translateToPortuguese.focusAreas[a] || a)
     .join(', ');
 
+  let profileSection = `PERFIL DO ALUNO:
+- Nível de condicionamento: ${levelPt}
+- Objetivo principal: ${goalPt}`;
+
+  if (userProfile) {
+    if (userProfile.age) {
+      profileSection += `\n- Idade: ${userProfile.age} anos`;
+    }
+    if (userProfile.height) {
+      profileSection += `\n- Altura: ${userProfile.height} cm`;
+    }
+    if (userProfile.weight) {
+      profileSection += `\n- Peso: ${userProfile.weight} kg`;
+    }
+    if (userProfile.goals && userProfile.goals.length > 0) {
+      profileSection += `\n- Objetivos adicionais: ${userProfile.goals.join(', ')}`;
+    }
+  }
+
   const prompt = `Crie um plano de treino personalizado com as seguintes características:
 
-PERFIL DO ALUNO:
-- Nível de condicionamento: ${levelPt}
-- Objetivo principal: ${goalPt}
+${profileSection}
 
 ESPECIFICAÇÕES DO TREINO:
 - Duração total: ${durationPt}

@@ -528,7 +528,35 @@ const exerciseTemplates = {
 const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
   console.log('🤖 Chamando API do GPT para gerar treino...');
 
-  const prompt = buildWorkoutPrompt(preferences);
+  let userProfile = null;
+
+  try {
+    if (isSupabaseConfigured()) {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('age, height, weight, fitness_level, goals')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile) {
+          userProfile = profile;
+          console.log('✅ Perfil do usuário carregado para personalização');
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Erro ao buscar perfil do usuário, continuando sem perfil:', error);
+  }
+
+  const preferencesWithProfile = {
+    ...preferences,
+    userProfile
+  };
+
+  const prompt = buildWorkoutPrompt(preferencesWithProfile);
 
   // Em produção, usa Supabase Edge Function. Em desenvolvimento, usa servidor local
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
