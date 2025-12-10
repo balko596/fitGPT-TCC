@@ -526,7 +526,7 @@ const exerciseTemplates = {
 };
 
 const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
-  console.log('🤖 Gerando treino personalizado...');
+  console.log('🤖 Chamando API do GPT para gerar treino...');
 
   let userProfile = null;
 
@@ -599,23 +599,23 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('❌ Erro da API:', errorData);
-      const apiError = errorData.error || 'Erro ao gerar treino personalizado';
+      const apiError = errorData.error || 'Erro ao gerar treino com IA';
 
       // Propagar mensagem de erro que inclui "cota" ou "quota" para ativar o fallback
       throw new Error(apiError);
     }
 
     const workoutData = await response.json();
-    console.log('✅ Treino gerado com sucesso:', workoutData.name);
+    console.log('✅ Treino gerado pela IA:', workoutData.name);
 
     return workoutData;
   } catch (error) {
     console.error('❌ Erro ao conectar com a API:', error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
       if (isDevelopment) {
-        throw new Error('⚠️ SERVIDOR BACKEND NÃO ESTÁ RODANDO!\n\nPara gerar treinos, você precisa rodar:\nnpm run dev:all\n\nOU em outro terminal:\nnpm run server');
+        throw new Error('⚠️ SERVIDOR BACKEND NÃO ESTÁ RODANDO!\n\nPara gerar treinos com IA, você precisa rodar:\nnpm run dev:all\n\nOU em outro terminal:\nnpm run server');
       } else {
-        throw new Error('⚠️ Erro ao conectar com o serviço. Tente novamente em alguns instantes.');
+        throw new Error('⚠️ Erro ao conectar com o serviço de IA. Tente novamente em alguns instantes.');
       }
     }
     throw error;
@@ -674,11 +674,11 @@ const generateWorkoutWithTemplates = (preferences: any): any => {
 };
 
 export const generateCustomWorkout = async (preferences: any): Promise<Workout> => {
-  console.log('🎨 Gerando treino personalizado:', preferences);
+  console.log('🎨 Gerando treino personalizado com IA:', preferences);
 
   try {
     const generatedWorkout = await generateWorkoutWithAI(preferences);
-    console.log('✅ Treino gerado com sucesso:', generatedWorkout.name);
+    console.log('✅ Treino gerado com IA:', generatedWorkout.name);
 
     try {
       if (isSupabaseConfigured()) {
@@ -714,11 +714,11 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
   } catch (error) {
     console.error('❌ Erro ao gerar treino personalizado:', error);
 
-    // Se o erro for relacionado à cota ou créditos, usar fallback de templates
+    // Se o erro for relacionado à cota ou créditos da OpenAI, usar fallback de templates
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (errorMessage.includes('cota') || errorMessage.includes('quota') || errorMessage.includes('créditos')) {
-      console.warn('⚠️ Serviço indisponível temporariamente. Usando templates locais como fallback...');
+      console.warn('⚠️ API OpenAI sem créditos. Usando templates locais como fallback...');
 
       try {
         const generatedWorkout = generateWorkoutWithTemplates(preferences);
@@ -740,7 +740,7 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
       throw error;
     }
 
-    throw new Error('Erro ao gerar treino. Verifique se o servidor backend está rodando (npm run server).');
+    throw new Error('Erro ao gerar treino com IA. Verifique se o servidor backend está rodando (npm run server).');
   }
 };
 
