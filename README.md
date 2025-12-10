@@ -2,16 +2,6 @@
 
 Uma aplicação moderna para geração de planos de treino personalizados usando inteligência artificial.
 
-##  Funcionalidades
-
-- ✅ **Geração de Treinos com IA** - Treinos personalizados usando GPT
-- ✅ **Sistema de Autenticação** - Login seguro com Supabase
-- ✅ **Favoritos e Histórico** - Salve seus treinos preferidos
-- ✅ **Agenda de Treinos** - Planeje sua semana de exercícios
-- ✅ **Acompanhamento de Progresso** - Estatísticas detalhadas
-- ✅ **Encontrar Academias** - Localize academias próximas
-- ✅ **Modo Offline** - Funciona sem configuração externa
-
 ##  Configuração
 
 ### 1. Instalar Dependências
