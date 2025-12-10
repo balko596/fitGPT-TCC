@@ -23,7 +23,7 @@ export const saveScheduleEntry = async (
   scheduledTime?: string, 
   notes?: string
 ): Promise<ScheduleEntry> => {
-  console.log('📅 Salvando agendamento:', { workoutId, scheduledDate, scheduledTime });
+  console.log('Salvando agendamento:', { workoutId, scheduledDate, scheduledTime });
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -47,15 +47,15 @@ export const saveScheduleEntry = async (
         .single();
 
       if (error) {
-        console.warn('⚠️ Erro ao salvar agendamento no Supabase:', error.message);
+        console.warn('Erro ao salvar agendamento no Supabase:', error.message);
         throw new Error('Erro ao salvar agendamento');
       }
 
-      console.log('✅ Agendamento salvo no Supabase');
+      console.log('Agendamento salvo no Supabase');
       return data;
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, salvando no localStorage');
+      console.log('Modo offline, salvando no localStorage');
       const savedSchedule = localStorage.getItem('workoutSchedule');
       let schedule: ScheduleEntry[] = savedSchedule ? JSON.parse(savedSchedule) : [];
       
@@ -72,18 +72,18 @@ export const saveScheduleEntry = async (
       
       schedule.push(newEntry);
       localStorage.setItem('workoutSchedule', JSON.stringify(schedule));
-      console.log('✅ Agendamento salvo no localStorage');
+      console.log('Agendamento salvo no localStorage');
       return newEntry;
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao salvar agendamento:', error);
+    console.warn('Erro ao salvar agendamento:', error);
     throw error;
   }
 };
 
 // Função para buscar agendamentos
 export const fetchScheduleEntries = async (startDate?: string, endDate?: string): Promise<ScheduleEntry[]> => {
-  console.log('📅 Carregando agendamentos...');
+  console.log('Carregando agendamentos...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -91,7 +91,7 @@ export const fetchScheduleEntries = async (startDate?: string, endDate?: string)
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return [];
       }
 
@@ -114,15 +114,15 @@ export const fetchScheduleEntries = async (startDate?: string, endDate?: string)
       const { data, error } = await query.order('scheduled_date', { ascending: true });
 
       if (error) {
-        console.warn('⚠️ Erro ao buscar agendamentos do Supabase:', error.message);
+        console.warn('Erro ao buscar agendamentos do Supabase:', error.message);
         return [];
       }
 
-      console.log('✅ Agendamentos carregados do Supabase:', data?.length || 0);
+      console.log('Agendamentos carregados do Supabase:', data?.length || 0);
       return data || [];
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, usando localStorage');
+      console.log('Modo offline, usando localStorage');
       const savedSchedule = localStorage.getItem('workoutSchedule');
       let schedule: ScheduleEntry[] = savedSchedule ? JSON.parse(savedSchedule) : [];
       
@@ -136,14 +136,14 @@ export const fetchScheduleEntries = async (startDate?: string, endDate?: string)
       return schedule;
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao carregar agendamentos:', error);
+    console.warn('Erro ao carregar agendamentos:', error);
     return [];
   }
 };
 
 // Função para marcar agendamento como concluído
 export const markScheduleEntryCompleted = async (entryId: string): Promise<void> => {
-  console.log('✅ Marcando agendamento como concluído:', entryId);
+  console.log('Marcando agendamento como concluído:', entryId);
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -161,14 +161,14 @@ export const markScheduleEntryCompleted = async (entryId: string): Promise<void>
         .eq('user_id', user.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao atualizar agendamento no Supabase:', error.message);
+        console.warn('Erro ao atualizar agendamento no Supabase:', error.message);
         throw new Error('Erro ao atualizar agendamento');
       }
       
-      console.log('✅ Agendamento atualizado no Supabase');
+      console.log('Agendamento atualizado no Supabase');
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, atualizando localStorage');
+      console.log('Modo offline, atualizando localStorage');
       const savedSchedule = localStorage.getItem('workoutSchedule');
       let schedule: ScheduleEntry[] = savedSchedule ? JSON.parse(savedSchedule) : [];
       
@@ -177,17 +177,17 @@ export const markScheduleEntryCompleted = async (entryId: string): Promise<void>
       );
       
       localStorage.setItem('workoutSchedule', JSON.stringify(schedule));
-      console.log('✅ Agendamento atualizado no localStorage');
+      console.log('Agendamento atualizado no localStorage');
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao atualizar agendamento:', error);
+    console.warn('Erro ao atualizar agendamento:', error);
     throw error;
   }
 };
 
 // Função para remover agendamento
 export const removeScheduleEntry = async (entryId: string): Promise<void> => {
-  console.log('🗑️ Removendo agendamento:', entryId);
+  console.log('Removendo agendamento:', entryId);
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -205,23 +205,23 @@ export const removeScheduleEntry = async (entryId: string): Promise<void> => {
         .eq('user_id', user.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao remover agendamento do Supabase:', error.message);
+        console.warn('Erro ao remover agendamento do Supabase:', error.message);
         throw new Error('Erro ao remover agendamento');
       }
       
-      console.log('✅ Agendamento removido do Supabase');
+      console.log('Agendamento removido do Supabase');
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, removendo do localStorage');
+      console.log('Modo offline, removendo do localStorage');
       const savedSchedule = localStorage.getItem('workoutSchedule');
       let schedule: ScheduleEntry[] = savedSchedule ? JSON.parse(savedSchedule) : [];
       
       schedule = schedule.filter(entry => entry.id !== entryId);
       localStorage.setItem('workoutSchedule', JSON.stringify(schedule));
-      console.log('✅ Agendamento removido do localStorage');
+      console.log('Agendamento removido do localStorage');
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao remover agendamento:', error);
+    console.warn('Erro ao remover agendamento:', error);
     throw error;
   }
 };

@@ -61,7 +61,7 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleCompleteReset = async () => {
-    if (!confirm('⚠️ RESET COMPLETO: Esta ação irá apagar TODOS os dados da aplicação, incluindo contas, treinos, favoritos, agenda e progresso. A aplicação será resetada para o estado inicial. Esta ação não pode ser desfeita. Tem certeza?')) {
+    if (!confirm('RESET COMPLETO: Esta ação irá apagar TODOS os dados da aplicação, incluindo contas, treinos, favoritos, agenda e progresso. A aplicação será resetada para o estado inicial. Esta ação não pode ser desfeita. Tem certeza?')) {
       return;
     }
 
@@ -92,7 +92,7 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleClearAllData = async () => {
-    if (!confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os seus dados pessoais, mas manterá os treinos padrão da aplicação. Tem certeza?')) {
+    if (!confirm('ATENÇÃO: Esta ação irá apagar TODOS os seus dados pessoais, mas manterá os treinos padrão da aplicação. Tem certeza?')) {
       return;
     }
 
@@ -450,7 +450,7 @@ const SettingsPage: React.FC = () => {
                           <li>Cache e dados temporários</li>
                         </ul>
                         <p className="text-red-700 text-sm font-medium mb-4">
-                          ⚠️ A aplicação será completamente resetada para o estado inicial!
+                          A aplicação será completamente resetada para o estado inicial!
                         </p>
                         <button
                           onClick={handleCompleteReset}
@@ -487,7 +487,7 @@ const SettingsPage: React.FC = () => {
                           <li>Estatísticas de progresso</li>
                         </ul>
                         <p className="text-orange-700 text-sm font-medium mb-4">
-                          ⚠️ Os treinos padrão da aplicação serão mantidos!
+                          Os treinos padrão da aplicação serão mantidos!
                         </p>
                         <button
                           onClick={handleClearAllData}

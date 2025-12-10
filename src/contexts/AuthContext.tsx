@@ -62,20 +62,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('🔐 AuthContext: Inicializando...');
+    console.log('AuthContext: Inicializando...');
     
     // Se Supabase estiver configurado, usar apenas Supabase
     if (isSupabaseConfigured()) {
-      console.log('✅ Supabase configurado, usando autenticação do Supabase');
+      console.log('Supabase configurado, usando autenticação do Supabase');
       initializeSupabaseAuth();
     } else {
-      console.log('⚠️ Supabase não configurado, usando modo offline com dados de teste');
+      console.log('Supabase não configurado, usando modo offline com dados de teste');
       initializeOfflineAuth();
     }
   }, []);
 
   const clearInvalidSession = async () => {
-    console.log('🧹 Limpando sessão inválida...');
+    console.log('Limpando sessão inválida...');
     
     // Limpar estado local
     setUser(null);
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await supabase.auth.signOut({ scope: 'local' });
     } catch (error) {
-      console.warn('⚠️ Erro ao fazer logout silencioso:', error);
+      console.warn('Erro ao fazer logout silencioso:', error);
     }
   };
 
@@ -99,13 +99,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
-        console.warn('⚠️ Erro ao obter sessão do Supabase:', error);
+        console.warn('Erro ao obter sessão do Supabase:', error);
         
         // Se o erro for relacionado a refresh token inválido, limpar a sessão
         if (error.message?.includes('refresh_token_not_found') || 
             error.message?.includes('Invalid Refresh Token') ||
             error.message?.includes('Refresh Token Not Found')) {
-          console.log('🔄 Token de refresh inválido detectado, limpando sessão...');
+          console.log('Token de refresh inválido detectado, limpando sessão...');
           await clearInvalidSession();
         }
         
@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      console.log('🔗 Sessão do Supabase:', !!session);
+      console.log('Sessão do Supabase:', !!session);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -127,11 +127,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('🔄 Auth state changed:', event, !!session);
+        console.log('Auth state changed:', event, !!session);
         
         // Se houver erro de token, limpar sessão
         if (event === 'TOKEN_REFRESHED' && !session) {
-          console.log('🔄 Falha na renovação do token, limpando sessão...');
+          console.log('Falha na renovação do token, limpando sessão...');
           await clearInvalidSession();
           setIsLoading(false);
           return;
@@ -151,14 +151,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return () => subscription.unsubscribe();
     } catch (error) {
-      console.warn('⚠️ Erro de conexão com Supabase:', error);
+      console.warn('Erro de conexão com Supabase:', error);
       
       // Se o erro for relacionado a refresh token, limpar sessão
       if (error instanceof Error && 
           (error.message?.includes('refresh_token_not_found') || 
            error.message?.includes('Invalid Refresh Token') ||
            error.message?.includes('Refresh Token Not Found'))) {
-        console.log('🔄 Erro de refresh token na inicialização, limpando sessão...');
+        console.log('Erro de refresh token na inicialização, limpando sessão...');
         await clearInvalidSession();
       }
       
@@ -172,12 +172,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedSession) {
       try {
         const sessionData = JSON.parse(savedSession);
-        console.log('📱 Sessão local encontrada');
+        console.log('Sessão local encontrada');
         setUser(sessionData.user);
         setProfile(sessionData.profile);
         setSession(sessionData.session);
       } catch (error) {
-        console.warn('⚠️ Erro ao carregar sessão local:', error);
+        console.warn('Erro ao carregar sessão local:', error);
         localStorage.removeItem('fitgpt_session');
       }
     }
@@ -186,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadUserProfile = async (userId: string) => {
     try {
-      console.log('👤 Carregando perfil do usuário:', userId);
+      console.log('Carregando perfil do usuário:', userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -195,13 +195,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.warn('⚠️ Erro ao carregar perfil do Supabase:', error);
+        console.warn('Erro ao carregar perfil do Supabase:', error);
       } else if (data) {
-        console.log('✅ Perfil carregado do Supabase');
+        console.log('Perfil carregado do Supabase');
         setProfile(data);
       }
     } catch (error) {
-      console.warn('⚠️ Erro ao carregar perfil:', error);
+      console.warn('Erro ao carregar perfil:', error);
     } finally {
       setIsLoading(false);
     }
@@ -214,7 +214,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Se Supabase estiver configurado, usar apenas Supabase
       if (isSupabaseConfigured()) {
-        console.log('🔐 Fazendo login no Supabase...');
+        console.log('Fazendo login no Supabase...');
         
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -222,13 +222,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         
         if (error) {
-          console.warn('⚠️ Erro no login do Supabase:', error.message);
+          console.warn('Erro no login do Supabase:', error.message);
           
           // Se o erro for relacionado a refresh token, limpar sessão antes de tentar novamente
           if (error.message?.includes('refresh_token_not_found') || 
               error.message?.includes('Invalid Refresh Token') ||
               error.message?.includes('Refresh Token Not Found')) {
-            console.log('🔄 Erro de refresh token no login, limpando sessão...');
+            console.log('Erro de refresh token no login, limpando sessão...');
             await clearInvalidSession();
           }
           
@@ -236,7 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         if (data.user) {
-          console.log('✅ Login no Supabase realizado com sucesso');
+          console.log('Login no Supabase realizado com sucesso');
           // O perfil será carregado automaticamente pelo onAuthStateChange
           return;
         }
@@ -245,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Fallback para dados de teste apenas se Supabase não estiver configurado
-      console.log('🔄 Usando credenciais de teste (modo offline)...');
+      console.log('Usando credenciais de teste (modo offline)...');
       const testUser = testUsers.find(u => u.email === email && u.password === password);
       
       if (testUser) {
@@ -271,7 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Salvar sessão localmente
         localStorage.setItem('fitgpt_session', JSON.stringify(mockSession));
         
-        console.log('✅ Login com dados de teste realizado');
+        console.log('Login com dados de teste realizado');
         return;
       }
       
@@ -292,7 +292,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Se Supabase estiver configurado, usar apenas Supabase
       if (isSupabaseConfigured()) {
-        console.log('📝 Registrando no Supabase...');
+        console.log('Registrando no Supabase...');
         
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -305,12 +305,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         
         if (error) {
-          console.warn('⚠️ Erro no registro do Supabase:', error.message);
+          console.warn('Erro no registro do Supabase:', error.message);
           throw new Error(error.message);
         }
         
         if (data.user) {
-          console.log('✅ Registro no Supabase realizado');
+          console.log('Registro no Supabase realizado');
           
           // O perfil será criado automaticamente pelo trigger
           // Aguardar um pouco para o trigger executar
@@ -327,7 +327,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Fallback para criação local apenas se Supabase não estiver configurado
-      console.log('🔄 Criando conta local de teste (modo offline)...');
+      console.log('Criando conta local de teste (modo offline)...');
       
       const newUserId = `test-user-${Date.now()}`;
       const newUser = {
@@ -373,7 +373,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       localStorage.setItem('fitgpt_session', JSON.stringify(mockSession));
       
-      console.log('✅ Conta local criada com sucesso');
+      console.log('Conta local criada com sucesso');
       
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao criar conta');
@@ -385,13 +385,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async (): Promise<void> => {
     try {
-      console.log('🚪 Fazendo logout...');
+      console.log('Fazendo logout...');
       
       // Se Supabase estiver configurado, fazer logout do Supabase
       if (isSupabaseConfigured()) {
         const { error } = await supabase.auth.signOut();
         if (error) {
-          console.warn('⚠️ Erro no logout do Supabase:', error);
+          console.warn('Erro no logout do Supabase:', error);
         }
       }
       
@@ -401,9 +401,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       localStorage.removeItem('fitgpt_session');
       
-      console.log('✅ Logout realizado com sucesso');
+      console.log('Logout realizado com sucesso');
     } catch (error) {
-      console.warn('⚠️ Erro ao fazer logout:', error);
+      console.warn('Erro ao fazer logout:', error);
       // Mesmo com erro, limpar estado local
       setUser(null);
       setProfile(null);
@@ -421,7 +421,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     
     try {
-      console.log('📝 Atualizando perfil...', data);
+      console.log('Atualizando perfil...', data);
       
       // Preparar dados para atualização
       const updateData = {
@@ -433,7 +433,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Se Supabase estiver configurado, tentar atualizar no Supabase
       if (isSupabaseConfigured()) {
-        console.log('🔄 Atualizando perfil no Supabase...');
+        console.log('Atualizando perfil no Supabase...');
         
         const { data: supabaseData, error } = await supabase
           .from('profiles')
@@ -443,19 +443,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .single();
         
         if (error) {
-          console.warn('⚠️ Erro ao atualizar perfil no Supabase:', error?.message);
+          console.warn('Erro ao atualizar perfil no Supabase:', error?.message);
           throw new Error('Erro ao atualizar perfil no banco de dados');
         }
         
         if (supabaseData) {
-          console.log('✅ Perfil atualizado no Supabase');
+          console.log('Perfil atualizado no Supabase');
           updatedProfile = supabaseData;
         } else {
           throw new Error('Nenhum dado retornado do Supabase');
         }
       } else {
         // Fallback para atualização local apenas se Supabase não estiver configurado
-        console.log('🔄 Atualizando perfil localmente (modo offline)...');
+        console.log('Atualizando perfil localmente (modo offline)...');
         updatedProfile = { ...profile, ...updateData } as Profile;
         
         // Atualizar usuário de teste se for o caso
@@ -475,15 +475,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const sessionData = JSON.parse(savedSession);
           sessionData.profile = updatedProfile;
           localStorage.setItem('fitgpt_session', JSON.stringify(sessionData));
-          console.log('✅ Sessão local atualizada com novo perfil');
+          console.log('Sessão local atualizada com novo perfil');
         } catch (error) {
-          console.warn('⚠️ Erro ao atualizar sessão local:', error);
+          console.warn('Erro ao atualizar sessão local:', error);
         }
       }
       
-      console.log('✅ Perfil atualizado com sucesso');
+      console.log('Perfil atualizado com sucesso');
     } catch (error) {
-      console.error('❌ Erro ao atualizar perfil:', error);
+      console.error('Erro ao atualizar perfil:', error);
       setError('Erro ao atualizar perfil');
       throw error;
     } finally {
@@ -493,7 +493,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearAllData = async (): Promise<void> => {
     try {
-      console.log('🗑️ Limpando todos os dados...');
+      console.log('Limpando todos os dados...');
       
       // Fazer logout se estiver autenticado
       if (isAuthenticated) {
@@ -517,9 +517,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       setError(null);
       
-      console.log('✅ Todos os dados foram limpos');
+      console.log('Todos os dados foram limpos');
     } catch (error) {
-      console.warn('⚠️ Erro ao limpar dados:', error);
+      console.warn('Erro ao limpar dados:', error);
       throw error;
     }
   };

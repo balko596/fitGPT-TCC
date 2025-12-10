@@ -311,12 +311,12 @@ const convertWorkoutToSupabase = (workout: Partial<Workout>, userId?: string) =>
 };
 
 export const fetchWorkouts = async (): Promise<Workout[]> => {
-  console.log('🔄 Iniciando carregamento de treinos...');
+  console.log('Iniciando carregamento de treinos...');
   
   try {
     // Se Supabase estiver configurado, tentar usar Supabase primeiro
     if (isSupabaseConfigured()) {
-      console.log('🔗 Tentando carregar treinos do Supabase...');
+      console.log('Tentando carregar treinos do Supabase...');
       
       try {
         const { data, error } = await supabase
@@ -325,35 +325,35 @@ export const fetchWorkouts = async (): Promise<Workout[]> => {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.warn('⚠️ Erro ao buscar treinos do Supabase:', error.message);
+          console.warn('Erro ao buscar treinos do Supabase:', error.message);
           // Não lançar erro, usar fallback
         } else if (data && data.length > 0) {
-          console.log('✅ Treinos carregados do Supabase:', data.length);
+          console.log('Treinos carregados do Supabase:', data.length);
           return data.map(convertSupabaseToWorkout);
         } else {
-          console.log('📭 Nenhum treino encontrado no Supabase, usando dados mock');
+          console.log('Nenhum treino encontrado no Supabase, usando dados mock');
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão com Supabase:', supabaseError);
+        console.warn('Erro de conexão com Supabase:', supabaseError);
         // Continuar para fallback
       }
     }
     
     // Fallback para dados mock
-    console.log('🎯 Usando dados mock (modo offline)');
+    console.log('Usando dados mock (modo offline)');
     return mockWorkouts;
     
   } catch (error) {
-    console.error('❌ Erro geral ao carregar treinos:', error);
+    console.error('Erro geral ao carregar treinos:', error);
     
     // Sempre retornar dados mock como último recurso
-    console.log('🔄 Retornando dados mock como fallback final');
+    console.log('Retornando dados mock como fallback final');
     return mockWorkouts;
   }
 };
 
 export const fetchWorkoutById = async (id: string): Promise<Workout> => {
-  console.log('🔍 Buscando treino por ID:', id);
+  console.log('Buscando treino por ID:', id);
   
   try {
     // Se Supabase estiver configurado, buscar no Supabase primeiro
@@ -366,29 +366,29 @@ export const fetchWorkoutById = async (id: string): Promise<Workout> => {
           .single();
 
         if (!error && data) {
-          console.log('✅ Treino encontrado no Supabase');
+          console.log('Treino encontrado no Supabase');
           return convertSupabaseToWorkout(data);
         }
         
         if (error && error.code !== 'PGRST116') {
-          console.warn('⚠️ Erro ao buscar treino no Supabase:', error.message);
+          console.warn('Erro ao buscar treino no Supabase:', error.message);
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão ao buscar treino:', supabaseError);
+        console.warn('Erro de conexão ao buscar treino:', supabaseError);
       }
     }
 
     // Fallback para dados mock
-    console.log('🔄 Buscando nos dados mock...');
+    console.log('Buscando nos dados mock...');
     const mockWorkout = mockWorkouts.find(w => w.id === id);
     if (mockWorkout) {
-      console.log('✅ Treino encontrado nos dados mock');
+      console.log('Treino encontrado nos dados mock');
       return mockWorkout;
     }
 
     throw new Error('Treino não encontrado');
   } catch (error) {
-    console.error('❌ Erro ao carregar treino:', error);
+    console.error('Erro ao carregar treino:', error);
     throw error;
   }
 };
@@ -526,7 +526,7 @@ const exerciseTemplates = {
 };
 
 const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
-  console.log('🤖 Chamando API do GPT para gerar treino...');
+  console.log('Chamando API do GPT para gerar treino...');
 
   let userProfile = null;
 
@@ -543,12 +543,12 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
 
         if (profile) {
           userProfile = profile;
-          console.log('✅ Perfil do usuário carregado para personalização');
+          console.log('Perfil do usuário carregado para personalização');
         }
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao buscar perfil do usuário, continuando sem perfil:', error);
+    console.warn('Erro ao buscar perfil do usuário, continuando sem perfil:', error);
   }
 
   const preferencesWithProfile = {
@@ -566,8 +566,8 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
     ? (import.meta.env.VITE_API_URL || 'http://localhost:5000')
     : `${supabaseUrl}/functions/v1/generate-workout`;
 
-  console.log('📡 URL da API:', apiUrl);
-  console.log('🌍 Ambiente:', isDevelopment ? 'Desenvolvimento' : 'Produção');
+  console.log('URL da API:', apiUrl);
+  console.log('Ambiente:', isDevelopment ? 'Desenvolvimento' : 'Produção');
 
   try {
     const headers: Record<string, string> = {
@@ -578,7 +578,7 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
     if (!isDevelopment) {
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       headers['Authorization'] = `Bearer ${anonKey}`;
-      console.log('🔑 Usando autenticação Supabase para Edge Function');
+      console.log('Usando autenticação Supabase para Edge Function');
     }
 
     const endpoint = isDevelopment ? `${apiUrl}/api/generate-workout` : apiUrl;
@@ -598,7 +598,7 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('❌ Erro da API:', errorData);
+      console.error('Erro da API:', errorData);
       const apiError = errorData.error || 'Erro ao gerar treino com IA';
 
       // Propagar mensagem de erro que inclui "cota" ou "quota" para ativar o fallback
@@ -606,16 +606,16 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
     }
 
     const workoutData = await response.json();
-    console.log('✅ Treino gerado pela IA:', workoutData.name);
+    console.log('Treino gerado pela IA:', workoutData.name);
 
     return workoutData;
   } catch (error) {
-    console.error('❌ Erro ao conectar com a API:', error);
+    console.error('Erro ao conectar com a API:', error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
       if (isDevelopment) {
-        throw new Error('⚠️ SERVIDOR BACKEND NÃO ESTÁ RODANDO!\n\nPara gerar treinos com IA, você precisa rodar:\nnpm run dev:all\n\nOU em outro terminal:\nnpm run server');
+        throw new Error('SERVIDOR BACKEND NÃO ESTÁ RODANDO!\n\nPara gerar treinos com IA, você precisa rodar:\nnpm run dev:all\n\nOU em outro terminal:\nnpm run server');
       } else {
-        throw new Error('⚠️ Erro ao conectar com o serviço de IA. Tente novamente em alguns instantes.');
+        throw new Error('Erro ao conectar com o serviço de IA. Tente novamente em alguns instantes.');
       }
     }
     throw error;
@@ -623,7 +623,7 @@ const generateWorkoutWithAI = async (preferences: any): Promise<any> => {
 };
 
 const generateWorkoutWithTemplates = (preferences: any): any => {
-  console.log('📋 Gerando treino com templates locais...');
+  console.log('Gerando treino com templates locais...');
 
   const { fitnessLevel, duration, goal, equipment, focusAreas } = preferences;
 
@@ -674,18 +674,18 @@ const generateWorkoutWithTemplates = (preferences: any): any => {
 };
 
 export const generateCustomWorkout = async (preferences: any): Promise<Workout> => {
-  console.log('🎨 Gerando treino personalizado com IA:', preferences);
+  console.log('Gerando treino personalizado com IA:', preferences);
 
   try {
     const generatedWorkout = await generateWorkoutWithAI(preferences);
-    console.log('✅ Treino gerado com IA:', generatedWorkout.name);
+    console.log('Treino gerado com IA:', generatedWorkout.name);
 
     try {
       if (isSupabaseConfigured()) {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
-          console.log('💾 Salvando treino no Supabase...');
+          console.log('Salvando treino no Supabase...');
           const { data, error } = await supabase
             .from('workouts')
             .insert(convertWorkoutToSupabase(generatedWorkout, user.id))
@@ -693,15 +693,15 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
             .single();
 
           if (!error && data) {
-            console.log('✅ Treino salvo no Supabase com sucesso');
+            console.log('Treino salvo no Supabase com sucesso');
             return convertSupabaseToWorkout(data);
           } else {
-            console.warn('⚠️ Erro ao salvar no Supabase:', error?.message);
+            console.warn('Erro ao salvar no Supabase:', error?.message);
           }
         }
       }
     } catch (supabaseError) {
-      console.warn('⚠️ Erro ao salvar no Supabase:', supabaseError);
+      console.warn('Erro ao salvar no Supabase:', supabaseError);
     }
 
     const localWorkout: Workout = {
@@ -709,20 +709,20 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
       ...generatedWorkout
     };
 
-    console.log('🎯 Treino criado:', localWorkout.name);
+    console.log('Treino criado:', localWorkout.name);
     return localWorkout;
   } catch (error) {
-    console.error('❌ Erro ao gerar treino personalizado:', error);
+    console.error('Erro ao gerar treino personalizado:', error);
 
     // Se o erro for relacionado à cota ou créditos da OpenAI, usar fallback de templates
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (errorMessage.includes('cota') || errorMessage.includes('quota') || errorMessage.includes('créditos')) {
-      console.warn('⚠️ API OpenAI sem créditos. Usando templates locais como fallback...');
+      console.warn('API OpenAI sem créditos. Usando templates locais como fallback...');
 
       try {
         const generatedWorkout = generateWorkoutWithTemplates(preferences);
-        console.log('✅ Treino gerado com templates:', generatedWorkout.name);
+        console.log('Treino gerado com templates:', generatedWorkout.name);
 
         const localWorkout: Workout = {
           id: Date.now().toString(),
@@ -731,7 +731,7 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
 
         return localWorkout;
       } catch (templateError) {
-        console.error('❌ Erro ao gerar treino com templates:', templateError);
+        console.error('Erro ao gerar treino com templates:', templateError);
         throw new Error('Não foi possível gerar o treino. Tente novamente mais tarde.');
       }
     }
@@ -746,7 +746,7 @@ export const generateCustomWorkout = async (preferences: any): Promise<Workout> 
 
 // Funções para favoritos
 export const fetchUserFavorites = async (): Promise<string[]> => {
-  console.log('⭐ Carregando favoritos...');
+  console.log('Carregando favoritos...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -755,7 +755,7 @@ export const fetchUserFavorites = async (): Promise<string[]> => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          console.log('👤 Usuário não autenticado');
+          console.log('Usuário não autenticado');
           return [];
         }
 
@@ -765,30 +765,30 @@ export const fetchUserFavorites = async (): Promise<string[]> => {
           .eq('user_id', user.id);
 
         if (error) {
-          console.warn('⚠️ Erro ao buscar favoritos do Supabase:', error.message);
+          console.warn('Erro ao buscar favoritos do Supabase:', error.message);
         } else {
-          console.log('✅ Favoritos carregados do Supabase:', data?.length || 0);
+          console.log('Favoritos carregados do Supabase:', data?.length || 0);
           return data ? data.map(fav => fav.workout_id) : [];
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão ao buscar favoritos:', supabaseError);
+        console.warn('Erro de conexão ao buscar favoritos:', supabaseError);
       }
     }
     
     // Fallback para localStorage
-    console.log('👤 Modo offline, usando localStorage');
+    console.log('Modo offline, usando localStorage');
     const savedFavorites = localStorage.getItem('workoutFavorites');
     return savedFavorites ? JSON.parse(savedFavorites) : [];
     
   } catch (error) {
-    console.warn('⚠️ Erro ao carregar favoritos:', error);
+    console.warn('Erro ao carregar favoritos:', error);
     const savedFavorites = localStorage.getItem('workoutFavorites');
     return savedFavorites ? JSON.parse(savedFavorites) : [];
   }
 };
 
 export const toggleFavorite = async (workoutId: string): Promise<boolean> => {
-  console.log('💫 Alternando favorito:', workoutId);
+  console.log('Alternando favorito:', workoutId);
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -797,7 +797,7 @@ export const toggleFavorite = async (workoutId: string): Promise<boolean> => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          console.log('👤 Usuário não autenticado, usando localStorage');
+          console.log('Usuário não autenticado, usando localStorage');
           // Fallback para localStorage se não autenticado
         } else {
           // Verificar se já é favorito
@@ -817,9 +817,9 @@ export const toggleFavorite = async (workoutId: string): Promise<boolean> => {
               .eq('workout_id', workoutId);
 
             if (error) {
-              console.warn('⚠️ Erro ao remover favorito do Supabase:', error.message);
+              console.warn('Erro ao remover favorito do Supabase:', error.message);
             } else {
-              console.log('✅ Favorito removido');
+              console.log('Favorito removido');
               return false;
             }
           } else {
@@ -832,20 +832,20 @@ export const toggleFavorite = async (workoutId: string): Promise<boolean> => {
               });
 
             if (error) {
-              console.warn('⚠️ Erro ao adicionar favorito no Supabase:', error.message);
+              console.warn('Erro ao adicionar favorito no Supabase:', error.message);
             } else {
-              console.log('✅ Favorito adicionado');
+              console.log('Favorito adicionado');
               return true;
             }
           }
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão ao alterar favorito:', supabaseError);
+        console.warn('Erro de conexão ao alterar favorito:', supabaseError);
       }
     }
     
     // Fallback para localStorage
-    console.log('👤 Modo offline, usando localStorage');
+    console.log('Modo offline, usando localStorage');
     const savedFavorites = localStorage.getItem('workoutFavorites');
     let favorites: string[] = savedFavorites ? JSON.parse(savedFavorites) : [];
     
@@ -858,18 +858,18 @@ export const toggleFavorite = async (workoutId: string): Promise<boolean> => {
     }
     
     localStorage.setItem('workoutFavorites', JSON.stringify(favorites));
-    console.log('✅ Favorito atualizado no localStorage');
+    console.log('Favorito atualizado no localStorage');
     return !isFavorite;
     
   } catch (error) {
-    console.warn('⚠️ Erro ao alterar favorito:', error);
+    console.warn('Erro ao alterar favorito:', error);
     throw error;
   }
 };
 
 // Função para salvar histórico de treinos
 export const saveWorkoutHistory = async (workoutId: string, durationMinutes?: number, notes?: string): Promise<void> => {
-  console.log('📝 Salvando histórico de treino:', workoutId);
+  console.log('Salvando histórico de treino:', workoutId);
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -878,7 +878,7 @@ export const saveWorkoutHistory = async (workoutId: string, durationMinutes?: nu
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          console.log('👤 Usuário não autenticado, usando localStorage');
+          console.log('Usuário não autenticado, usando localStorage');
         } else {
           const { error } = await supabase
             .from('user_workout_history')
@@ -890,9 +890,9 @@ export const saveWorkoutHistory = async (workoutId: string, durationMinutes?: nu
             });
 
           if (error) {
-            console.warn('⚠️ Erro ao salvar histórico no Supabase:', error.message);
+            console.warn('Erro ao salvar histórico no Supabase:', error.message);
           } else {
-            console.log('✅ Histórico salvo no Supabase');
+            console.log('Histórico salvo no Supabase');
             
             // Atualizar progresso após salvar histórico
             const workout = await fetchWorkoutById(workoutId);
@@ -901,12 +901,12 @@ export const saveWorkoutHistory = async (workoutId: string, durationMinutes?: nu
           }
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão ao salvar histórico:', supabaseError);
+        console.warn('Erro de conexão ao salvar histórico:', supabaseError);
       }
     }
     
     // Fallback para localStorage
-    console.log('👤 Modo offline, salvando no localStorage');
+    console.log('Modo offline, salvando no localStorage');
     const savedHistory = localStorage.getItem('workoutHistory');
     let history: any[] = savedHistory ? JSON.parse(savedHistory) : [];
     
@@ -919,21 +919,21 @@ export const saveWorkoutHistory = async (workoutId: string, durationMinutes?: nu
     });
     
     localStorage.setItem('workoutHistory', JSON.stringify(history));
-    console.log('✅ Histórico salvo no localStorage');
+    console.log('Histórico salvo no localStorage');
 
     // Atualizar progresso após salvar histórico
     const workout = await fetchWorkoutById(workoutId);
     await updateProgressAfterWorkout(durationMinutes || workout.durationMinutes, workout.calories);
     
   } catch (error) {
-    console.warn('⚠️ Erro ao salvar histórico:', error);
+    console.warn('Erro ao salvar histórico:', error);
     throw error;
   }
 };
 
 // Função para buscar histórico de treinos
 export const fetchWorkoutHistory = async (): Promise<any[]> => {
-  console.log('📊 Carregando histórico de treinos...');
+  console.log('Carregando histórico de treinos...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -942,7 +942,7 @@ export const fetchWorkoutHistory = async (): Promise<any[]> => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          console.log('👤 Usuário não autenticado');
+          console.log('Usuário não autenticado');
           return [];
         }
 
@@ -960,23 +960,23 @@ export const fetchWorkoutHistory = async (): Promise<any[]> => {
           .order('completed_at', { ascending: false });
 
         if (error) {
-          console.warn('⚠️ Erro ao buscar histórico do Supabase:', error.message);
+          console.warn('Erro ao buscar histórico do Supabase:', error.message);
         } else {
-          console.log('✅ Histórico carregado do Supabase:', data?.length || 0);
+          console.log('Histórico carregado do Supabase:', data?.length || 0);
           return data || [];
         }
       } catch (supabaseError) {
-        console.warn('⚠️ Erro de conexão ao buscar histórico:', supabaseError);
+        console.warn('Erro de conexão ao buscar histórico:', supabaseError);
       }
     }
     
     // Fallback para localStorage
-    console.log('👤 Modo offline, usando localStorage');
+    console.log('Modo offline, usando localStorage');
     const savedHistory = localStorage.getItem('workoutHistory');
     return savedHistory ? JSON.parse(savedHistory) : [];
     
   } catch (error) {
-    console.warn('⚠️ Erro ao carregar histórico:', error);
+    console.warn('Erro ao carregar histórico:', error);
     return [];
   }
 };

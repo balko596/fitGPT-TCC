@@ -3,13 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-console.log('🔧 Configuração Supabase:', {
-  url: supabaseUrl ? '✅ Configurada' : '❌ Não configurada',
-  key: supabaseAnonKey ? '✅ Configurada' : '❌ Não configurada'
+console.log('Configuração Supabase:', {
+  url: supabaseUrl ? 'Configurada' : 'Não configurada',
+  key: supabaseAnonKey ? 'Configurada' : 'Não configurada'
 });
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Variáveis de ambiente do Supabase não encontradas. Usando modo offline.');
+  console.warn('Variáveis de ambiente do Supabase não encontradas. Usando modo offline.');
 }
 
 export const supabase = createClient(
@@ -179,22 +179,22 @@ export type WorkoutHistory = Database['public']['Tables']['user_workout_history'
 export const testConnection = async () => {
   try {
     if (!isSupabaseConfigured()) {
-      console.log('🔧 Supabase não configurado, usando modo offline');
+      console.log('Supabase não configurado, usando modo offline');
       return false;
     }
 
-    console.log('🔗 Testando conexão com Supabase...');
+    console.log('Testando conexão com Supabase...');
     const { data, error } = await supabase.from('workouts').select('count').limit(1)
     
     if (error) {
-      console.warn('⚠️ Erro de conexão com Supabase:', error.message);
+      console.warn('Erro de conexão com Supabase:', error.message);
       return false;
     }
     
-    console.log('✅ Conexão com Supabase estabelecida com sucesso');
+    console.log('Conexão com Supabase estabelecida com sucesso');
     return true;
   } catch (error) {
-    console.warn('⚠️ Erro ao testar conexão:', error);
+    console.warn('Erro ao testar conexão:', error);
     return false;
   }
 }

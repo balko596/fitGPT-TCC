@@ -88,12 +88,12 @@ const RegisterPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('📝 Tentando registrar usuário...');
+      console.log('Tentando registrar usuário...');
       await register(formData.name, formData.email, formData.password);
-      console.log('✅ Registro realizado com sucesso');
+      console.log('Registro realizado com sucesso');
       navigate('/');
     } catch (err) {
-      console.error('❌ Erro no registro:', err);
+      console.error('Erro no registro:', err);
       setError(err instanceof Error ? err.message : 'Erro ao criar conta');
     } finally {
       setIsSubmitting(false);

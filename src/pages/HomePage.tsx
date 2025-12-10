@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
   };
 
   const handleWorkoutSuccess = (workout: any) => {
-    console.log('✅ Treino criado com sucesso:', workout);
+    console.log('Treino criado com sucesso:', workout);
     setGeneratedWorkoutId(workout.id);
     setShowSuccessModal(true);
   };

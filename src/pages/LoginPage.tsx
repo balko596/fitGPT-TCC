@@ -31,12 +31,12 @@ const LoginPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('🔐 Tentando fazer login...');
+      console.log('Tentando fazer login...');
       await login(formData.email, formData.password);
-      console.log('✅ Login realizado com sucesso');
+      console.log('Login realizado com sucesso');
       navigate(from, { replace: true });
     } catch (err) {
-      console.error('❌ Erro no login:', err);
+      console.error('Erro no login:', err);
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {
       setIsSubmitting(false);

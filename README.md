@@ -133,10 +133,10 @@ server/
 
 ## Segurança
 
-- ✅ Row Level Security (RLS) habilitado no Supabase
-- ✅ Autenticação segura com JWT
-- ✅ Validação de dados no frontend e backend
-- ✅ Sanitização de inputs
+- Row Level Security (RLS) habilitado no Supabase
+- Autenticação segura com JWT
+- Validação de dados no frontend e backend
+- Sanitização de inputs
 
 ## Contribuição
 
@@ -161,4 +161,4 @@ Se encontrar problemas:
 
 ---
 
-**Desenvolvido com ❤️ usando React, TypeScript, Tailwind CSS e Supabase**
+**Desenvolvido usando React, TypeScript, Tailwind CSS e Supabase**

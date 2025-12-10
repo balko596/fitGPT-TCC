@@ -48,7 +48,7 @@ const WorkoutGenerator: React.FC<WorkoutGeneratorProps> = ({ onGenerate, isLoadi
     setIsSuccess(false);
 
     try {
-      console.log('🎯 WorkoutGenerator: Enviando preferências:', preferences);
+      console.log('WorkoutGenerator: Enviando preferências:', preferences);
       const workout = await onGenerate(preferences);
       setIsSuccess(true);
 
@@ -61,7 +61,7 @@ const WorkoutGenerator: React.FC<WorkoutGeneratorProps> = ({ onGenerate, isLoadi
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
-      console.error('❌ WorkoutGenerator: Erro ao gerar treino:', error);
+      console.error('WorkoutGenerator: Erro ao gerar treino:', error);
     }
   };
 

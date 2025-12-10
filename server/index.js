@@ -19,17 +19,17 @@ app.use(cors());
 app.use(express.json());
 
 // Debug: Verificar se a chave foi carregada
-console.log('🔍 Verificando variáveis de ambiente...');
-console.log('📂 Diretório atual:', __dirname);
-console.log('📄 Arquivo .env em:', path.resolve(__dirname, '../.env'));
+console.log('Verificando variáveis de ambiente...');
+console.log('Diretório atual:', __dirname);
+console.log('Arquivo .env em:', path.resolve(__dirname, '../.env'));
 
 const apiKey = process.env.OPENAI_API_KEY;
 if (apiKey) {
-  console.log('✅ OPENAI_API_KEY encontrada!');
-  console.log('🔑 Primeiros caracteres:', apiKey.substring(0, 10) + '...');
+  console.log('OPENAI_API_KEY encontrada!');
+  console.log('Primeiros caracteres:', apiKey.substring(0, 10) + '...');
 } else {
-  console.error('❌ OPENAI_API_KEY NÃO encontrada!');
-  console.log('📋 Variáveis disponíveis:', Object.keys(process.env).filter(k => k.includes('OPENAI')));
+  console.error('OPENAI_API_KEY NÃO encontrada!');
+  console.log('Variáveis disponíveis:', Object.keys(process.env).filter(k => k.includes('OPENAI')));
 }
 
 // Initialize OpenAI
@@ -39,18 +39,18 @@ if (apiKey) {
     openai = new OpenAI({
       apiKey: apiKey
     });
-    console.log('✅ OpenAI configurado com sucesso');
+    console.log('OpenAI configurado com sucesso');
   } catch (error) {
-    console.error('❌ Erro ao inicializar OpenAI:', error.message);
+    console.error('Erro ao inicializar OpenAI:', error.message);
   }
 } else {
-  console.warn('⚠️ OPENAI_API_KEY não encontrada. Funcionalidade de IA desabilitada.');
+  console.warn('OPENAI_API_KEY não encontrada. Funcionalidade de IA desabilitada.');
 }
 
 app.post('/api/generate-workout', async (req, res) => {
   try {
-    console.log('🤖 Recebendo solicitação de geração de treino');
-    console.log('📋 Preferências:', {
+    console.log('Recebendo solicitação de geração de treino');
+    console.log('Preferências:', {
       fitnessLevel: req.body.fitnessLevel,
       duration: req.body.duration,
       goal: req.body.goal,
@@ -59,7 +59,7 @@ app.post('/api/generate-workout', async (req, res) => {
     });
 
     if (!openai) {
-      console.warn('⚠️ OpenAI não configurado, retornando erro');
+      console.warn('OpenAI não configurado, retornando erro');
       return res.status(503).json({
         error: 'Serviço de IA temporariamente indisponível. Configure OPENAI_API_KEY no arquivo .env'
       });
@@ -71,8 +71,8 @@ app.post('/api/generate-workout', async (req, res) => {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
     }
 
-    console.log('🔄 Enviando prompt para OpenAI GPT-3.5-turbo...');
-    console.log('📝 Tamanho do prompt:', prompt.length, 'caracteres');
+    console.log('Enviando prompt para OpenAI GPT-3.5-turbo...');
+    console.log('Tamanho do prompt:', prompt.length, 'caracteres');
 
     const completion = await openai.chat.completions.create({
       messages: [
@@ -91,33 +91,33 @@ app.post('/api/generate-workout', async (req, res) => {
       response_format: { type: 'json_object' }
     });
 
-    console.log('✅ Resposta recebida do OpenAI');
-    console.log('📊 Tokens usados:', completion.usage?.total_tokens || 'N/A');
+    console.log('Resposta recebida do OpenAI');
+    console.log('Tokens usados:', completion.usage?.total_tokens || 'N/A');
 
     const workoutString = completion.choices[0].message.content.trim();
-    console.log('📝 Primeiros 200 caracteres da resposta:', workoutString.substring(0, 200));
+    console.log('Primeiros 200 caracteres da resposta:', workoutString.substring(0, 200));
 
     let workoutJson;
     try {
       workoutJson = JSON.parse(workoutString);
-      console.log('✅ JSON parseado com sucesso');
+      console.log('JSON parseado com sucesso');
     } catch (parseError) {
-      console.error('❌ Erro ao fazer parse do JSON:', parseError.message);
-      console.log('📄 Conteúdo completo que falhou:', workoutString);
+      console.error('Erro ao fazer parse do JSON:', parseError.message);
+      console.log('Conteúdo completo que falhou:', workoutString);
 
       const jsonMatch = workoutString.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
           workoutJson = JSON.parse(jsonMatch[0]);
-          console.log('✅ JSON extraído com regex e parseado com sucesso');
+          console.log('JSON extraído com regex e parseado com sucesso');
         } catch (secondParseError) {
-          console.error('❌ Falha na segunda tentativa de parse:', secondParseError.message);
+          console.error('Falha na segunda tentativa de parse:', secondParseError.message);
           return res.status(500).json({
             error: 'Resposta da IA não está em formato JSON válido'
           });
         }
       } else {
-        console.error('❌ Nenhum JSON encontrado na resposta');
+        console.error('Nenhum JSON encontrado na resposta');
         return res.status(500).json({
           error: 'Nenhum JSON encontrado na resposta da IA'
         });
@@ -125,26 +125,26 @@ app.post('/api/generate-workout', async (req, res) => {
     }
 
     if (!workoutJson.name || !workoutJson.exercises || !Array.isArray(workoutJson.exercises)) {
-      console.error('❌ Estrutura JSON inválida:', Object.keys(workoutJson));
+      console.error('Estrutura JSON inválida:', Object.keys(workoutJson));
       return res.status(500).json({
         error: 'Estrutura de treino inválida retornada pela IA'
       });
     }
 
     if (workoutJson.exercises.length === 0) {
-      console.error('❌ Nenhum exercício no treino');
+      console.error('Nenhum exercício no treino');
       return res.status(500).json({
         error: 'Treino gerado sem exercícios'
       });
     }
 
-    console.log('✅ Treino gerado com sucesso:', workoutJson.name);
-    console.log('💪 Número de exercícios:', workoutJson.exercises.length);
+    console.log('Treino gerado com sucesso:', workoutJson.name);
+    console.log('Número de exercícios:', workoutJson.exercises.length);
 
     res.json(workoutJson);
   } catch (error) {
-    console.error('❌ Erro ao gerar treino:', error.message);
-    console.error('🔍 Stack trace:', error.stack);
+    console.error('Erro ao gerar treino:', error.message);
+    console.error('Stack trace:', error.stack);
 
     if (error.code === 'insufficient_quota') {
       return res.status(429).json({
@@ -186,17 +186,17 @@ app.get('/api/workouts', (req, res) => {
 
 // Middleware de tratamento de erros
 app.use((error, req, res, next) => {
-  console.error('❌ Erro não tratado:', error);
+  console.error('Erro não tratado:', error);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`📡 API disponível em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`API disponível em http://localhost:${PORT}`);
   if (openai) {
-    console.log('🤖 Serviço de IA ativo');
+    console.log('Serviço de IA ativo');
   } else {
-    console.log('⚠️ Serviço de IA inativo - configure OPENAI_API_KEY');
+    console.log('Serviço de IA inativo - configure OPENAI_API_KEY');
   }
 });

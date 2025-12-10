@@ -127,8 +127,7 @@ const GymFinderPage: React.FC = () => {
                   <p className="text-sm text-slate-600">{gym.vicinity}</p>
                   {gym.rating && (
                     <div className="flex items-center mt-1">
-                      <span className="text-amber-500">★</span>
-                      <span className="text-sm ml-1">{gym.rating}</span>
+                      <span className="text-sm">Rating: {gym.rating}</span>
                     </div>
                   )}
                   {gym.openNow !== undefined && (
@@ -177,8 +176,7 @@ const GymFinderPage: React.FC = () => {
                     <p className="text-sm">{selectedGym.vicinity}</p>
                     {selectedGym.rating && (
                       <div className="flex items-center mt-1">
-                        <span className="text-amber-500">★</span>
-                        <span className="text-sm ml-1">{selectedGym.rating}</span>
+                        <span className="text-sm">Rating: {selectedGym.rating}</span>
                       </div>
                     )}
                   </div>

@@ -35,7 +35,7 @@ const getMonthStartDate = (date: Date): string => {
 
 // Função para buscar ou criar estatísticas do usuário
 export const getUserProgressStats = async (): Promise<UserProgressStats | null> => {
-  console.log('📊 Carregando estatísticas de progresso...');
+  console.log('Carregando estatísticas de progresso...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -43,7 +43,7 @@ export const getUserProgressStats = async (): Promise<UserProgressStats | null> 
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return null;
       }
 
@@ -61,17 +61,17 @@ export const getUserProgressStats = async (): Promise<UserProgressStats | null> 
         .maybeSingle();
 
       if (fetchError) {
-        console.warn('⚠️ Erro ao buscar estatísticas do Supabase:', fetchError.message);
+        console.warn('Erro ao buscar estatísticas do Supabase:', fetchError.message);
         return null;
       }
 
       if (existingStats) {
-        console.log('✅ Estatísticas encontradas no Supabase');
+        console.log('Estatísticas encontradas no Supabase');
         return existingStats;
       }
 
       // Se não existir, criar novas estatísticas
-      console.log('📝 Criando novas estatísticas...');
+      console.log('Criando novas estatísticas...');
       const { data: newStats, error: createError } = await supabase
         .from('user_progress_stats')
         .insert({
@@ -92,15 +92,15 @@ export const getUserProgressStats = async (): Promise<UserProgressStats | null> 
         .single();
 
       if (createError) {
-        console.warn('⚠️ Erro ao criar estatísticas no Supabase:', createError.message);
+        console.warn('Erro ao criar estatísticas no Supabase:', createError.message);
         return null;
       }
 
-      console.log('✅ Novas estatísticas criadas no Supabase');
+      console.log('Novas estatísticas criadas no Supabase');
       return newStats;
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, usando localStorage');
+      console.log('Modo offline, usando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         return JSON.parse(savedStats);
@@ -130,7 +130,7 @@ export const getUserProgressStats = async (): Promise<UserProgressStats | null> 
       return defaultStats;
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao carregar estatísticas:', error);
+    console.warn('Erro ao carregar estatísticas:', error);
     return null;
   }
 };
@@ -140,7 +140,7 @@ export const updateProgressAfterWorkout = async (
   durationMinutes: number = 0, 
   caloriesBurned: number = 0
 ): Promise<void> => {
-  console.log('📈 Atualizando progresso após treino...');
+  console.log('Atualizando progresso após treino...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -148,7 +148,7 @@ export const updateProgressAfterWorkout = async (
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return;
       }
 
@@ -160,7 +160,7 @@ export const updateProgressAfterWorkout = async (
       let stats = await getUserProgressStats();
       
       if (!stats) {
-        console.warn('⚠️ Não foi possível obter estatísticas');
+        console.warn('Não foi possível obter estatísticas');
         return;
       }
 
@@ -169,7 +169,7 @@ export const updateProgressAfterWorkout = async (
       const needsMonthReset = stats.month_start_date !== monthStart;
 
       if (needsWeekReset || needsMonthReset) {
-        console.log('🔄 Resetando período...', { needsWeekReset, needsMonthReset });
+        console.log('Resetando período...', { needsWeekReset, needsMonthReset });
         
         const { error: resetError } = await supabase
           .from('user_progress_stats')
@@ -189,9 +189,9 @@ export const updateProgressAfterWorkout = async (
           });
 
         if (resetError) {
-          console.warn('⚠️ Erro ao resetar período:', resetError.message);
+          console.warn('Erro ao resetar período:', resetError.message);
         } else {
-          console.log('✅ Período resetado com sucesso');
+          console.log('Período resetado com sucesso');
         }
       } else {
         // Atualizar estatísticas existentes
@@ -209,14 +209,14 @@ export const updateProgressAfterWorkout = async (
           .eq('id', stats.id);
 
         if (updateError) {
-          console.warn('⚠️ Erro ao atualizar progresso:', updateError.message);
+          console.warn('Erro ao atualizar progresso:', updateError.message);
         } else {
-          console.log('✅ Progresso atualizado com sucesso');
+          console.log('Progresso atualizado com sucesso');
         }
       }
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, atualizando localStorage');
+      console.log('Modo offline, atualizando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         const stats: UserProgressStats = JSON.parse(savedStats);
@@ -230,17 +230,17 @@ export const updateProgressAfterWorkout = async (
         stats.updated_at = new Date().toISOString();
         
         localStorage.setItem('userProgressStats', JSON.stringify(stats));
-        console.log('✅ Progresso atualizado no localStorage');
+        console.log('Progresso atualizado no localStorage');
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao atualizar progresso:', error);
+    console.warn('Erro ao atualizar progresso:', error);
   }
 };
 
 // Função para resetar progresso semanal
 export const resetWeeklyProgress = async (): Promise<void> => {
-  console.log('🔄 Resetando progresso semanal...');
+  console.log('Resetando progresso semanal...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -248,7 +248,7 @@ export const resetWeeklyProgress = async (): Promise<void> => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return;
       }
 
@@ -264,14 +264,14 @@ export const resetWeeklyProgress = async (): Promise<void> => {
         .eq('id', stats.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao resetar progresso semanal:', error.message);
+        console.warn('Erro ao resetar progresso semanal:', error.message);
         throw new Error('Erro ao resetar progresso semanal');
       } else {
-        console.log('✅ Progresso semanal resetado com sucesso');
+        console.log('Progresso semanal resetado com sucesso');
       }
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, resetando localStorage');
+      console.log('Modo offline, resetando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         const stats: UserProgressStats = JSON.parse(savedStats);
@@ -280,18 +280,18 @@ export const resetWeeklyProgress = async (): Promise<void> => {
         stats.updated_at = new Date().toISOString();
         
         localStorage.setItem('userProgressStats', JSON.stringify(stats));
-        console.log('✅ Progresso semanal resetado no localStorage');
+        console.log('Progresso semanal resetado no localStorage');
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao resetar progresso semanal:', error);
+    console.warn('Erro ao resetar progresso semanal:', error);
     throw error;
   }
 };
 
 // Função para resetar progresso mensal
 export const resetMonthlyProgress = async (): Promise<void> => {
-  console.log('🔄 Resetando progresso mensal...');
+  console.log('Resetando progresso mensal...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -299,7 +299,7 @@ export const resetMonthlyProgress = async (): Promise<void> => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return;
       }
 
@@ -315,14 +315,14 @@ export const resetMonthlyProgress = async (): Promise<void> => {
         .eq('id', stats.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao resetar progresso mensal:', error.message);
+        console.warn('Erro ao resetar progresso mensal:', error.message);
         throw new Error('Erro ao resetar progresso mensal');
       } else {
-        console.log('✅ Progresso mensal resetado com sucesso');
+        console.log('Progresso mensal resetado com sucesso');
       }
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, resetando localStorage');
+      console.log('Modo offline, resetando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         const stats: UserProgressStats = JSON.parse(savedStats);
@@ -331,18 +331,18 @@ export const resetMonthlyProgress = async (): Promise<void> => {
         stats.updated_at = new Date().toISOString();
         
         localStorage.setItem('userProgressStats', JSON.stringify(stats));
-        console.log('✅ Progresso mensal resetado no localStorage');
+        console.log('Progresso mensal resetado no localStorage');
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao resetar progresso mensal:', error);
+    console.warn('Erro ao resetar progresso mensal:', error);
     throw error;
   }
 };
 
 // Função para atualizar metas
 export const updateGoals = async (weeklyGoal: number, monthlyGoal: number): Promise<void> => {
-  console.log('🎯 Atualizando metas...', { weeklyGoal, monthlyGoal });
+  console.log('Atualizando metas...', { weeklyGoal, monthlyGoal });
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -350,7 +350,7 @@ export const updateGoals = async (weeklyGoal: number, monthlyGoal: number): Prom
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return;
       }
 
@@ -366,14 +366,14 @@ export const updateGoals = async (weeklyGoal: number, monthlyGoal: number): Prom
         .eq('id', stats.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao atualizar metas:', error.message);
+        console.warn('Erro ao atualizar metas:', error.message);
         throw new Error('Erro ao atualizar metas');
       } else {
-        console.log('✅ Metas atualizadas com sucesso');
+        console.log('Metas atualizadas com sucesso');
       }
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, atualizando localStorage');
+      console.log('Modo offline, atualizando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         const stats: UserProgressStats = JSON.parse(savedStats);
@@ -382,18 +382,18 @@ export const updateGoals = async (weeklyGoal: number, monthlyGoal: number): Prom
         stats.updated_at = new Date().toISOString();
         
         localStorage.setItem('userProgressStats', JSON.stringify(stats));
-        console.log('✅ Metas atualizadas no localStorage');
+        console.log('Metas atualizadas no localStorage');
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao atualizar metas:', error);
+    console.warn('Erro ao atualizar metas:', error);
     throw error;
   }
 };
 
 // Função para resetar streak (sequência)
 export const resetStreak = async (): Promise<void> => {
-  console.log('🔄 Resetando sequência...');
+  console.log('Resetando sequência...');
   
   try {
     // Se Supabase estiver configurado, usar Supabase
@@ -401,7 +401,7 @@ export const resetStreak = async (): Promise<void> => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('👤 Usuário não autenticado');
+        console.log('Usuário não autenticado');
         return;
       }
 
@@ -416,14 +416,14 @@ export const resetStreak = async (): Promise<void> => {
         .eq('id', stats.id);
 
       if (error) {
-        console.warn('⚠️ Erro ao resetar sequência:', error.message);
+        console.warn('Erro ao resetar sequência:', error.message);
         throw new Error('Erro ao resetar sequência');
       } else {
-        console.log('✅ Sequência resetada com sucesso');
+        console.log('Sequência resetada com sucesso');
       }
     } else {
       // Fallback para localStorage apenas se Supabase não estiver configurado
-      console.log('👤 Modo offline, resetando localStorage');
+      console.log('Modo offline, resetando localStorage');
       const savedStats = localStorage.getItem('userProgressStats');
       if (savedStats) {
         const stats: UserProgressStats = JSON.parse(savedStats);
@@ -431,11 +431,11 @@ export const resetStreak = async (): Promise<void> => {
         stats.updated_at = new Date().toISOString();
         
         localStorage.setItem('userProgressStats', JSON.stringify(stats));
-        console.log('✅ Sequência resetada no localStorage');
+        console.log('Sequência resetada no localStorage');
       }
     }
   } catch (error) {
-    console.warn('⚠️ Erro ao resetar sequência:', error);
+    console.warn('Erro ao resetar sequência:', error);
     throw error;
   }
 };
