@@ -21,14 +21,14 @@ const AboutPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">Nossa Missão</h2>
           </div>
           <p className="text-slate-600">
-            O FitGPT é dedicado a tornar o fitness mais acessível e personalizado através do poder da inteligência artificial. Nossa plataforma usa tecnologia GPT avançada para fornecer planos de treino abrangentes adaptados aos seus objetivos específicos, nível de condicionamento e preferências.
+            O FitGPT é dedicado a tornar o fitness mais acessível e personalizado. Nossa plataforma fornece planos de treino abrangentes adaptados aos seus objetivos específicos, nível de condicionamento e preferências.
           </p>
         </div>
         
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Como Funciona</h2>
           <p className="text-slate-600 mb-4">
-            Nossa aplicação combina ciência do exercício com análise alimentada por GPT para gerar rotinas de treino eficazes e equilibradas. Usamos processamento de linguagem natural para entender seus objetivos de fitness e criar programas que se adaptam ao seu progresso.
+            Nossa aplicação combina ciência do exercício com análise avançada para gerar rotinas de treino eficazes e equilibradas. Entendemos seus objetivos de fitness e criamos programas que se adaptam ao seu progresso.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -44,9 +44,9 @@ const AboutPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h3 className="font-medium mb-2">Backend Alimentado por IA</h3>
+                <h3 className="font-medium mb-2">Backend Inteligente</h3>
                 <p className="text-slate-600 text-sm">
-                  Nosso backend Node.js integra com GPT para analisar e gerar planos de treino abrangentes baseados em princípios da ciência do exercício, garantindo rotinas eficazes e equilibradas.
+                  Nosso backend avançado analisa e gera planos de treino abrangentes baseados em princípios da ciência do exercício, garantindo rotinas eficazes e equilibradas.
                 </p>
               </div>
             </motion.div>
@@ -103,7 +103,7 @@ const AboutPage: React.FC = () => {
               <div>
                 <h3 className="font-medium mb-2">Experiência Personalizada</h3>
                 <p className="text-slate-600 text-sm">
-                  Nossa IA se adapta ao seu nível de condicionamento, objetivos e equipamentos disponíveis para criar planos de treino verdadeiramente personalizados que evoluem conforme você progride em sua jornada fitness.
+                  Nossa plataforma se adapta ao seu nível de condicionamento, objetivos e equipamentos disponíveis para criar planos de treino verdadeiramente personalizados que evoluem conforme você progride em sua jornada fitness.
                 </p>
               </div>
             </motion.div>
@@ -120,10 +120,10 @@ const AboutPage: React.FC = () => {
         >
           <h2 className="text-xl font-semibold mb-4">Nossa Equipe</h2>
           <p className="text-slate-600 mb-4">
-            O FitGPT foi criado por uma equipe de entusiastas do fitness, especialistas em IA e personal trainers certificados que acreditam que todos merecem acesso a orientação fitness de alta qualidade.
+            O FitGPT foi criado por uma equipe de entusiastas do fitness, especialistas em tecnologia e personal trainers certificados que acreditam que todos merecem acesso a orientação fitness de alta qualidade.
           </p>
           <p className="text-slate-600">
-            Nossos especialistas combinam seu conhecimento da ciência do exercício com tecnologia de IA de ponta para garantir que nossos planos de treino sejam não apenas inteligentes, mas também seguros e eficazes.
+            Nossos especialistas combinam seu conhecimento da ciência do exercício com tecnologia avançada para garantir que nossos planos de treino sejam não apenas inteligentes, mas também seguros e eficazes.
           </p>
         </motion.div>
         
@@ -155,7 +155,7 @@ const AboutPage: React.FC = () => {
         <div className="p-6 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Comece Sua Jornada Fitness Hoje</h2>
           <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            Seja você um iniciante ou um atleta experiente, o FitGPT pode ajudá-lo a alcançar seus objetivos fitness com planos de treino personalizados e alimentados por IA.
+            Seja você um iniciante ou um atleta experiente, o FitGPT pode ajudá-lo a alcançar seus objetivos fitness com planos de treino personalizados.
           </p>
           <a href="/workouts" className="btn-accent inline-block">
             Explorar Treinos

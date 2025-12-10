@@ -109,13 +109,13 @@ const HomePage: React.FC = () => {
         ></div>
         <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
           <div className="max-w-2xl mx-auto text-center text-white">
-            <motion.h1 
+            <motion.h1
               className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Planos de Treino com IA
+              Planos de Treino Personalizados
             </motion.h1>
             <motion.p
               className="text-xl mb-8 text-blue-100"
@@ -123,7 +123,7 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Obtenha rotinas de treino personalizadas geradas por inteligência artificial
+              Obtenha rotinas de treino personalizadas para seus objetivos
             </motion.p>
 
             {isAuthenticated ? (
@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-4">Crie Seu Plano de Treino Personalizado</h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Nossa IA criará uma rotina de treino personalizada baseada nos seus objetivos, nível de condicionamento e equipamentos disponíveis.
+                Crie uma rotina de treino personalizada baseada nos seus objetivos, nível de condicionamento e equipamentos disponíveis.
               </p>
             </div>
 
@@ -210,7 +210,7 @@ const HomePage: React.FC = () => {
                 <Dumbbell className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-medium mb-2">Treinos Inteligentes</h3>
-              <p className="text-slate-600">Planos de treino personalizados criados por IA baseados nos seus objetivos e preferências</p>
+              <p className="text-slate-600">Planos de treino personalizados baseados nos seus objetivos e preferências</p>
             </motion.div>
             
             <motion.div 

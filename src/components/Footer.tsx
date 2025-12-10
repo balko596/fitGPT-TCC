@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
               <span className="text-xl font-bold">FitGPT</span>
             </div>
             <p className="text-slate-300">
-              Planos de treino alimentados por IA e acompanhamento de fitness. Seu companheiro inteligente para um estilo de vida mais saudável.
+              Planos de treino personalizados e acompanhamento de fitness. Seu companheiro inteligente para um estilo de vida mais saudável.
             </p>
           </div>
           
