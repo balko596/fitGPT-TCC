@@ -2,7 +2,7 @@
 
 Uma aplicação moderna para geração de planos de treino personalizados usando inteligência artificial.
 
-## 🚀 Funcionalidades
+##  Funcionalidades
 
 - ✅ **Geração de Treinos com IA** - Treinos personalizados usando GPT
 - ✅ **Sistema de Autenticação** - Login seguro com Supabase
@@ -12,7 +12,7 @@ Uma aplicação moderna para geração de planos de treino personalizados usando
 - ✅ **Encontrar Academias** - Localize academias próximas
 - ✅ **Modo Offline** - Funciona sem configuração externa
 
-## 🛠️ Configuração
+##  Configuração
 
 ### 1. Instalar Dependências
 
@@ -73,7 +73,7 @@ npm run server
 npm run dev:all
 ```
 
-## 🔧 Configurações Opcionais
+## Configurações Opcionais
 
 ### OpenAI (Geração de Treinos com IA)
 
@@ -93,7 +93,7 @@ Para habilitar a busca de academias:
 3. Gere uma API key
 4. Adicione a chave no arquivo `.env`
 
-## 📱 Como Usar
+## Como Usar
 
 ### Modo Offline (Padrão)
 
@@ -109,7 +109,7 @@ Com Supabase configurado:
 - Sincronização entre dispositivos
 - Persistência de dados na nuvem
 
-## 🏗️ Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 src/
@@ -127,7 +127,7 @@ server/
 └── index.js           # Servidor Express (OpenAI)
 ```
 
-## 🚀 Deploy
+##  Deploy
 
 ### Netlify (Recomendado)
 
@@ -141,14 +141,14 @@ server/
 2. Configure as variáveis de ambiente
 3. Deploy automático
 
-## 🔒 Segurança
+## Segurança
 
 - ✅ Row Level Security (RLS) habilitado no Supabase
 - ✅ Autenticação segura com JWT
 - ✅ Validação de dados no frontend e backend
 - ✅ Sanitização de inputs
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature
@@ -156,11 +156,11 @@ server/
 4. Push para a branch
 5. Abra um Pull Request
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para detalhes.
 
-## 🆘 Suporte
+## Suporte
 
 Se encontrar problemas:
 
